@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "dist/production-server",
+    "target": "es2017",
+    "lib": ["es2017"],
+    "allowSyntheticDefaultImports": false
+  },
+  "include": ["server/**/*.ts"]
+}
