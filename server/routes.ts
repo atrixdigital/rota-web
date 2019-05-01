@@ -6,3 +6,4 @@ export const Router = routes.Router;
 export const Link = routes.Link;
 
 // routes.add("project", "/project/:id");
+routes.add("auth", "/auth/:route");

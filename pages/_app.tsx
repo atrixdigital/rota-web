@@ -1,11 +1,12 @@
 import App, { Container } from "next/app";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { far } from "@fortawesome/free-regular-svg-icons";
-import { fab } from "@fortawesome/free-brands-svg-icons";
-library.add(fas, far, fab);
-import "../assets/theme.css";
-import "../assets/style.css";
+
+// import "../assets/vendor/nucleo/css/nucleo.css";
+// import "../assets/vendor/@fortawesome/fontawesome-free/css/all.min.css";
+// import "../assets/scss/argon-dashboard-react.scss";
+
+import "../static/assets/vendor/nucleo/css/nucleo.css";
+import "../static/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css";
+import "../static/assets/css/argon-dashboard-react.css";
 
 // @ts-ignore
 import TopBarProgress from "react-topbar-progress-indicator";
