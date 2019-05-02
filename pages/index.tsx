@@ -4,7 +4,7 @@ import { MyContext } from "../interfaces/MyContext";
 
 export default class extends React.Component {
   static getInitialProps(ctx: MyContext) {
-    redirect(ctx, "/about");
+    redirect(ctx, "/auth/login");
     return {};
   }
 
