@@ -72,7 +72,7 @@ class DashBoard extends Component<{}, State> {
   render() {
     return (
       <AdminLayout>
-        <Header />
+        <Header showCards={true} />
         {/* Page content */}
         <Container className="mt--7" fluid>
           <Row>

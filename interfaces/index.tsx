@@ -1,10 +1,11 @@
-// You can include shared interfaces in a separate file and then
-// use them in any component by importing them. For example, to
-// import the interface below do:
-//
-// import IDataObject from 'path/to/interfaces';
+export interface SelectOption {
+  o_id: string;
+  o_title: string;
+}
 
-export default interface IDataObject {
-  id: number
-  name: string
+export interface FieldsOptions {
+  f_name: string;
+  f_type: string;
+  f_label: string;
+  f_options?: SelectOption[];
 }

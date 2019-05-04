@@ -4,8 +4,13 @@ import Sidebar from "./Sidebar/Sidebar";
 import AdminNavbar from "./Navbars/AdminNavbar";
 import AdminFooter from "./Footers/AdminFooter";
 
-class AdminLayout extends Component {
+interface Props {
+  pageTitle?: string;
+}
+
+class AdminLayout extends Component<Props> {
   render() {
+    const { pageTitle } = this.props;
     return (
       <>
         <Sidebar
@@ -17,7 +22,10 @@ class AdminLayout extends Component {
           }}
         />
         <div className="main-content" ref="mainContent">
-          <AdminNavbar {...this.props} brandText="Dashboard" />
+          <AdminNavbar
+            {...this.props}
+            brandText={`${pageTitle ? pageTitle : "Dashboard"}`}
+          />
           {this.props.children}
           <Container fluid>
             <AdminFooter />
