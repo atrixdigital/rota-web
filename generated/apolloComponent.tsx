@@ -123,6 +123,51 @@ export type GetAllDepartmentUser = {
   name: string;
 };
 
+export type CreateRoleVariables = {
+  data: CreateRoleInput;
+};
+
+export type CreateRoleMutation = {
+  __typename?: "Mutation";
+
+  createRole: CreateRoleCreateRole;
+};
+
+export type CreateRoleCreateRole = RoleBasicFragmentFragment;
+
+export type DeleteByRoleIdVariables = {
+  data: string;
+};
+
+export type DeleteByRoleIdMutation = {
+  __typename?: "Mutation";
+
+  deleteByRoleID: boolean;
+};
+
+export type UpdateByRoleIdVariables = {
+  id: string;
+  data: UpdateRoleInput;
+};
+
+export type UpdateByRoleIdMutation = {
+  __typename?: "Mutation";
+
+  updateByRoleID: UpdateByRoleIdUpdateByRoleId;
+};
+
+export type UpdateByRoleIdUpdateByRoleId = RoleBasicFragmentFragment;
+
+export type GetAllRoleVariables = {};
+
+export type GetAllRoleQuery = {
+  __typename?: "Query";
+
+  getAllRole: GetAllRoleGetAllRole[];
+};
+
+export type GetAllRoleGetAllRole = RoleBasicFragmentFragment;
+
 export type GetAllRoleNoAuthVariables = {};
 
 export type GetAllRoleNoAuthQuery = {
@@ -147,6 +192,28 @@ export type ConfirmUserMutation = {
   __typename?: "Mutation";
 
   confirmUser: boolean;
+};
+
+export type CreateUserVariables = {
+  data: CreateUserInput;
+};
+
+export type CreateUserMutation = {
+  __typename?: "Mutation";
+
+  createUser: CreateUserCreateUser;
+};
+
+export type CreateUserCreateUser = UserBasicFragmentFragment;
+
+export type DeleteByUserIdVariables = {
+  data: string;
+};
+
+export type DeleteByUserIdMutation = {
+  __typename?: "Mutation";
+
+  deleteByUserID: boolean;
 };
 
 export type LoginVariables = {
@@ -198,6 +265,19 @@ export type RegisterRegister = {
   email: string;
 };
 
+export type UpdateByUserIdVariables = {
+  id: string;
+  data: UpdateUserInput;
+};
+
+export type UpdateByUserIdMutation = {
+  __typename?: "Mutation";
+
+  updateByUserID: UpdateByUserIdUpdateByUserId;
+};
+
+export type UpdateByUserIdUpdateByUserId = UserBasicFragmentFragment;
+
 export type GetAllUserVariables = {};
 
 export type GetAllUserQuery = {
@@ -206,13 +286,7 @@ export type GetAllUserQuery = {
   getAllUser: GetAllUserGetAllUser[];
 };
 
-export type GetAllUserGetAllUser = {
-  __typename?: "User";
-
-  id: string;
-
-  name: string;
-};
+export type GetAllUserGetAllUser = UserBasicFragmentFragment;
 
 export type DepartmentBasicFragmentFragment = {
   __typename?: "Department";
@@ -224,6 +298,32 @@ export type DepartmentBasicFragmentFragment = {
   email: string;
 
   phone: string;
+};
+
+export type RoleBasicFragmentFragment = {
+  __typename?: "Role";
+
+  id: string;
+
+  title: string;
+};
+
+export type UserBasicFragmentFragment = {
+  __typename?: "User";
+
+  id: string;
+
+  firstName: string;
+
+  lastName: string;
+
+  name: string;
+
+  email: string;
+
+  password: string;
+
+  appproved: Maybe<boolean>;
 };
 
 import * as ReactApollo from "react-apollo";
@@ -241,6 +341,25 @@ export const DepartmentBasicFragmentFragmentDoc = gql`
     title
     email
     phone
+  }
+`;
+
+export const RoleBasicFragmentFragmentDoc = gql`
+  fragment RoleBasicFragment on Role {
+    id
+    title
+  }
+`;
+
+export const UserBasicFragmentFragmentDoc = gql`
+  fragment UserBasicFragment on User {
+    id
+    firstName
+    lastName
+    name
+    email
+    password
+    appproved
   }
 `;
 
@@ -457,6 +576,186 @@ export function GetAllDepartmentHOC<TProps, TChildProps = any>(
     GetAllDepartmentProps<TChildProps>
   >(GetAllDepartmentDocument, operationOptions);
 }
+export const CreateRoleDocument = gql`
+  mutation CreateRole($data: CreateRoleInput!) {
+    createRole(data: $data) {
+      ...RoleBasicFragment
+    }
+  }
+
+  ${RoleBasicFragmentFragmentDoc}
+`;
+export class CreateRoleComponent extends React.Component<
+  Partial<ReactApollo.MutationProps<CreateRoleMutation, CreateRoleVariables>>
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<CreateRoleMutation, CreateRoleVariables>
+        mutation={CreateRoleDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type CreateRoleProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<CreateRoleMutation, CreateRoleVariables>
+> &
+  TChildProps;
+export type CreateRoleMutationFn = ReactApollo.MutationFn<
+  CreateRoleMutation,
+  CreateRoleVariables
+>;
+export function CreateRoleHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        CreateRoleMutation,
+        CreateRoleVariables,
+        CreateRoleProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    CreateRoleMutation,
+    CreateRoleVariables,
+    CreateRoleProps<TChildProps>
+  >(CreateRoleDocument, operationOptions);
+}
+export const DeleteByRoleIdDocument = gql`
+  mutation DeleteByRoleID($data: String!) {
+    deleteByRoleID(id: $data)
+  }
+`;
+export class DeleteByRoleIdComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<DeleteByRoleIdMutation, DeleteByRoleIdVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<DeleteByRoleIdMutation, DeleteByRoleIdVariables>
+        mutation={DeleteByRoleIdDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type DeleteByRoleIdProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<DeleteByRoleIdMutation, DeleteByRoleIdVariables>
+> &
+  TChildProps;
+export type DeleteByRoleIdMutationFn = ReactApollo.MutationFn<
+  DeleteByRoleIdMutation,
+  DeleteByRoleIdVariables
+>;
+export function DeleteByRoleIdHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        DeleteByRoleIdMutation,
+        DeleteByRoleIdVariables,
+        DeleteByRoleIdProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    DeleteByRoleIdMutation,
+    DeleteByRoleIdVariables,
+    DeleteByRoleIdProps<TChildProps>
+  >(DeleteByRoleIdDocument, operationOptions);
+}
+export const UpdateByRoleIdDocument = gql`
+  mutation UpdateByRoleID($id: String!, $data: UpdateRoleInput!) {
+    updateByRoleID(id: $id, data: $data) {
+      ...RoleBasicFragment
+    }
+  }
+
+  ${RoleBasicFragmentFragmentDoc}
+`;
+export class UpdateByRoleIdComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<UpdateByRoleIdMutation, UpdateByRoleIdVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<UpdateByRoleIdMutation, UpdateByRoleIdVariables>
+        mutation={UpdateByRoleIdDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type UpdateByRoleIdProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<UpdateByRoleIdMutation, UpdateByRoleIdVariables>
+> &
+  TChildProps;
+export type UpdateByRoleIdMutationFn = ReactApollo.MutationFn<
+  UpdateByRoleIdMutation,
+  UpdateByRoleIdVariables
+>;
+export function UpdateByRoleIdHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        UpdateByRoleIdMutation,
+        UpdateByRoleIdVariables,
+        UpdateByRoleIdProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    UpdateByRoleIdMutation,
+    UpdateByRoleIdVariables,
+    UpdateByRoleIdProps<TChildProps>
+  >(UpdateByRoleIdDocument, operationOptions);
+}
+export const GetAllRoleDocument = gql`
+  query GetAllRole {
+    getAllRole {
+      ...RoleBasicFragment
+    }
+  }
+
+  ${RoleBasicFragmentFragmentDoc}
+`;
+export class GetAllRoleComponent extends React.Component<
+  Partial<ReactApollo.QueryProps<GetAllRoleQuery, GetAllRoleVariables>>
+> {
+  render() {
+    return (
+      <ReactApollo.Query<GetAllRoleQuery, GetAllRoleVariables>
+        query={GetAllRoleDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type GetAllRoleProps<TChildProps = any> = Partial<
+  ReactApollo.DataProps<GetAllRoleQuery, GetAllRoleVariables>
+> &
+  TChildProps;
+export function GetAllRoleHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        GetAllRoleQuery,
+        GetAllRoleVariables,
+        GetAllRoleProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    GetAllRoleQuery,
+    GetAllRoleVariables,
+    GetAllRoleProps<TChildProps>
+  >(GetAllRoleDocument, operationOptions);
+}
 export const GetAllRoleNoAuthDocument = gql`
   query GetAllRoleNoAuth {
     getAllRoleNoAuth {
@@ -541,6 +840,96 @@ export function ConfirmUserHOC<TProps, TChildProps = any>(
     ConfirmUserVariables,
     ConfirmUserProps<TChildProps>
   >(ConfirmUserDocument, operationOptions);
+}
+export const CreateUserDocument = gql`
+  mutation CreateUser($data: CreateUserInput!) {
+    createUser(data: $data) {
+      ...UserBasicFragment
+    }
+  }
+
+  ${UserBasicFragmentFragmentDoc}
+`;
+export class CreateUserComponent extends React.Component<
+  Partial<ReactApollo.MutationProps<CreateUserMutation, CreateUserVariables>>
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<CreateUserMutation, CreateUserVariables>
+        mutation={CreateUserDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type CreateUserProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<CreateUserMutation, CreateUserVariables>
+> &
+  TChildProps;
+export type CreateUserMutationFn = ReactApollo.MutationFn<
+  CreateUserMutation,
+  CreateUserVariables
+>;
+export function CreateUserHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        CreateUserMutation,
+        CreateUserVariables,
+        CreateUserProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    CreateUserMutation,
+    CreateUserVariables,
+    CreateUserProps<TChildProps>
+  >(CreateUserDocument, operationOptions);
+}
+export const DeleteByUserIdDocument = gql`
+  mutation DeleteByUserID($data: String!) {
+    deleteByUserID(id: $data)
+  }
+`;
+export class DeleteByUserIdComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<DeleteByUserIdMutation, DeleteByUserIdVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<DeleteByUserIdMutation, DeleteByUserIdVariables>
+        mutation={DeleteByUserIdDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type DeleteByUserIdProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<DeleteByUserIdMutation, DeleteByUserIdVariables>
+> &
+  TChildProps;
+export type DeleteByUserIdMutationFn = ReactApollo.MutationFn<
+  DeleteByUserIdMutation,
+  DeleteByUserIdVariables
+>;
+export function DeleteByUserIdHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        DeleteByUserIdMutation,
+        DeleteByUserIdVariables,
+        DeleteByUserIdProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    DeleteByUserIdMutation,
+    DeleteByUserIdVariables,
+    DeleteByUserIdProps<TChildProps>
+  >(DeleteByUserIdDocument, operationOptions);
 }
 export const LoginDocument = gql`
   mutation Login($email: String!, $password: String!) {
@@ -676,13 +1065,62 @@ export function RegisterHOC<TProps, TChildProps = any>(
     RegisterProps<TChildProps>
   >(RegisterDocument, operationOptions);
 }
+export const UpdateByUserIdDocument = gql`
+  mutation UpdateByUserID($id: String!, $data: UpdateUserInput!) {
+    updateByUserID(id: $id, data: $data) {
+      ...UserBasicFragment
+    }
+  }
+
+  ${UserBasicFragmentFragmentDoc}
+`;
+export class UpdateByUserIdComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<UpdateByUserIdMutation, UpdateByUserIdVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<UpdateByUserIdMutation, UpdateByUserIdVariables>
+        mutation={UpdateByUserIdDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type UpdateByUserIdProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<UpdateByUserIdMutation, UpdateByUserIdVariables>
+> &
+  TChildProps;
+export type UpdateByUserIdMutationFn = ReactApollo.MutationFn<
+  UpdateByUserIdMutation,
+  UpdateByUserIdVariables
+>;
+export function UpdateByUserIdHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        UpdateByUserIdMutation,
+        UpdateByUserIdVariables,
+        UpdateByUserIdProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    UpdateByUserIdMutation,
+    UpdateByUserIdVariables,
+    UpdateByUserIdProps<TChildProps>
+  >(UpdateByUserIdDocument, operationOptions);
+}
 export const GetAllUserDocument = gql`
   query GetAllUser {
     getAllUser {
-      id
-      name
+      ...UserBasicFragment
     }
   }
+
+  ${UserBasicFragmentFragmentDoc}
 `;
 export class GetAllUserComponent extends React.Component<
   Partial<ReactApollo.QueryProps<GetAllUserQuery, GetAllUserVariables>>

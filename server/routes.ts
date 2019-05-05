@@ -8,8 +8,8 @@ export const Link = routes.Link;
 
 // routes.add("project", "/project/:id");
 routes.add("auth", "/auth/:route");
-routes.add("crud", "department");
+routes.add("crud", "/crud/:myRoute");
 // dynamicRoutes.map(route => {
-//   routes.add("crud", route.path);
+//   routes.add("crud", `/crud`);
 // });
 routes.add("confirm", "/user/confirm/:token");

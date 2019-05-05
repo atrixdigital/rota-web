@@ -30,3 +30,6 @@ export const validateLoginSchema = yup.object().shape({
     .required(),
   password: yup.string().required()
 });
+export const validateRoleSchema = yup.object().shape({
+  title: yup.string().required()
+});

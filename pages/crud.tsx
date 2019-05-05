@@ -27,6 +27,8 @@ import InputField from "../components/input-field";
 import { dynamicRoutes, DynamicRoutes } from "../shared/dynamicRoutes";
 import Department from "../views/Department";
 import { FieldsOptions } from "../interfaces";
+import User from "../views/User";
+import Role from "../views/Role";
 
 interface Mutation {
   mutation: any;
@@ -68,13 +70,20 @@ class Crud extends Component<Props, State> {
     formFields: []
   };
 
-  static async getInitialProps({ asPath, res }) {
-    const routeIndex = dynamicRoutes.findIndex(dR => dR.path == asPath);
+  static async getInitialProps({ query, res }) {
+    const routeIndex = dynamicRoutes.findIndex(
+      dR => dR.path == `/${query.myRoute}`
+    );
     if (routeIndex == -1) {
       res.statusCode = 404;
       return;
     }
-    return { route: dynamicRoutes[routeIndex] };
+    return {
+      route: {
+        path: `/${query.myRoute}`,
+        title: dynamicRoutes[routeIndex].title
+      }
+    };
   }
 
   _toggleModal = () =>
@@ -106,6 +115,7 @@ class Crud extends Component<Props, State> {
 
   _routeData = () => {
     const { route } = this.props;
+
     const { data } = this.state;
     switch (route.path) {
       case "/department":
@@ -116,13 +126,13 @@ class Crud extends Component<Props, State> {
         break;
       case "/user":
         if (data.length <= 0) {
-          return <Department callBack={this._setAllState} />;
+          return <User callBack={this._setAllState} />;
         }
         return <div />;
         break;
       case "/role":
         if (data.length <= 0) {
-          return <Department callBack={this._setAllState} />;
+          return <Role callBack={this._setAllState} />;
         }
         return <div />;
         break;
@@ -215,7 +225,7 @@ class Crud extends Component<Props, State> {
                 <CardHeader className="border-0">
                   <Row className="align-items-center">
                     <div className="col-11">
-                      <h3 className="mb-0">Departments</h3>
+                      <h3 className="mb-0">{route.title}</h3>
                     </div>
                     <div className="col text-right">
                       <Button

@@ -9,7 +9,8 @@ RUN yarn install --production
 # RUN npm install
 
 COPY ./dist/ ./dist/
-COPY ./.env .
+COPY ./static/ ./static/
+COPY ./.env.production ./.env
 COPY ./next.config.js .
 
 ENV NODE_ENV production
