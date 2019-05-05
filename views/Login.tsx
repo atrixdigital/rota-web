@@ -1,5 +1,6 @@
 import React from "react";
 
+
 // reactstrap components
 import {
   Button,
@@ -54,7 +55,7 @@ class Login extends React.Component {
                   <Card className="bg-secondary shadow border-0">
                     <CardBody className="px-lg-5 py-lg-5">
                       <div className="text-center text-muted mb-4">
-                        <small>Sign in with credentials</small>
+                        <small>Sign in with Administration credentials</small>
                       </div>
                       <Form role="form">
                         <FormGroup className="mb-3">

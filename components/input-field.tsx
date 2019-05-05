@@ -75,7 +75,7 @@ const InputField: React.SFC<FieldProps<any> & InputFieldI> = ({
       />
       {/* </FormGroup> */}
       {errorMsg !== undefined && (
-        <label id="cname-error" className="error" htmlFor={field.name}>
+        <label id="cname-error" className="text-danger small" style={{marginTop:'30px'}} htmlFor={field.name}>
           {errorMsg}
         </label>
       )}
