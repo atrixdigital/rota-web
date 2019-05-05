@@ -67,7 +67,7 @@ class AdminNavbar extends React.Component<Props> {
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-menu-arrow" right>
                   <DropdownItem className="noti-title" header tag="div">
-                    <h6 className="text-overflow m-0">Welcome!</h6>
+                    <h6 className="text-overflow m-0">Rota Dashboard</h6>
                   </DropdownItem>
                   <Link href="/admin/user-profile">
                     <DropdownItem>
