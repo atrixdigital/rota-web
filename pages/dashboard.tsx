@@ -31,6 +31,7 @@ import {
 } from "../variables/charts";
 
 import Header from "../components/Headers/Header";
+import { withAuthSync } from "../lib/withAuthSync";
 
 interface State {
   activeNav: number;
@@ -345,4 +346,4 @@ class DashBoard extends Component<{}, State> {
   }
 }
 
-export default DashBoard;
+export default withAuthSync(DashBoard);

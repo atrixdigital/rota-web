@@ -29,6 +29,7 @@ import Department from "../views/Department";
 import { FieldsOptions } from "../interfaces";
 import User from "../views/User";
 import Role from "../views/Role";
+import { withAuthSync } from "../lib/withAuthSync";
 
 interface Mutation {
   mutation: any;
@@ -318,7 +319,7 @@ class Crud extends Component<Props, State> {
   }
 }
 
-export default Crud;
+export default withAuthSync(Crud);
 
 interface ModalProps<T> {
   crud_toggle: () => void;
