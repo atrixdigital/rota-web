@@ -13,3 +13,20 @@ export const validateDepartmentSchema = yup.object().shape({
   phone: yup.string().required(),
   userID: yup.string().required()
 });
+export const validateRegisterSchema = yup.object().shape({
+  firstName: yup.string().required(),
+  lastName: yup.string().required(),
+  email: yup
+    .string()
+    .email()
+    .required(),
+  password: yup.string().required(),
+  roleID: yup.string().required()
+});
+export const validateLoginSchema = yup.object().shape({
+  email: yup
+    .string()
+    .email()
+    .required(),
+  password: yup.string().required()
+});

@@ -70,14 +70,12 @@ class Sidebar extends React.Component<Props, State> {
     return routes.map((prop, key) => {
       return (
         <NavItem key={key}>
-          <NavLink
-            to={prop.layout + prop.path}
-            onClick={this.closeCollapse}
-            activeClassName="active"
-          >
-            <i className={prop.icon} />
-            {prop.name}
-          </NavLink>
+          <Link href={prop.path}>
+            <NavLink onClick={this.closeCollapse} activeClassName="active">
+              {prop.icon && <i className={prop.icon} />}
+              {prop.title}
+            </NavLink>
+          </Link>
         </NavItem>
       );
     });

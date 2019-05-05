@@ -1,7 +1,7 @@
 FROM node:10.15.1
 
 # Create app directory
-WORKDIR /my-profile-next
+WORKDIR /rota-web
 
 COPY ./package.json .
 

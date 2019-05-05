@@ -5,6 +5,10 @@ export const getAllDepartment = gql`
   query GetAllDepartment {
     getAllDepartment {
       ...DepartmentBasicFragment
+      user {
+        id
+        name
+      }
     }
   }
   ${DepartmentBasicFragment}

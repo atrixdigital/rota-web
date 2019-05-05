@@ -18,6 +18,8 @@ import {
   Container,
   Media
 } from "reactstrap";
+import { LogoutComponent } from "../../generated/apolloComponent";
+import Router from "next/router";
 
 interface Props {
   brandText: string;
@@ -93,10 +95,21 @@ class AdminNavbar extends React.Component<Props> {
                   </Link>
 
                   <DropdownItem divider />
-                  <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
-                    <i className="ni ni-user-run" />
-                    <span>Logout</span>
-                  </DropdownItem>
+                  <LogoutComponent>
+                    {mutate => (
+                      <DropdownItem
+                        href=""
+                        onClick={async e => {
+                          e.preventDefault();
+                          await mutate();
+                          Router.push("/auth/login");
+                        }}
+                      >
+                        <i className="ni ni-user-run" />
+                        <span>Logout</span>
+                      </DropdownItem>
+                    )}
+                  </LogoutComponent>
                 </DropdownMenu>
               </UncontrolledDropdown>
             </Nav>

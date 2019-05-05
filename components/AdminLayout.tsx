@@ -3,6 +3,7 @@ import { Container } from "reactstrap";
 import Sidebar from "./Sidebar/Sidebar";
 import AdminNavbar from "./Navbars/AdminNavbar";
 import AdminFooter from "./Footers/AdminFooter";
+import { dynamicRoutes } from "../shared/dynamicRoutes";
 
 interface Props {
   pageTitle?: string;
@@ -14,7 +15,7 @@ class AdminLayout extends Component<Props> {
     return (
       <>
         <Sidebar
-          routes={[{}]}
+          routes={dynamicRoutes}
           logo={{
             innerLink: "/dashboard",
             imgSrc: require("../static/assets/img/brand/argon-react.png"),

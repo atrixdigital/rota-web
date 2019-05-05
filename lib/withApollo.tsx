@@ -1,22 +1,51 @@
 import React from "react";
+import cookie from "cookie";
+import PropTypes from "prop-types";
 import initApollo from "./init-apollo";
 import Head from "next/head";
 import { getDataFromTree } from "react-apollo";
 import { isBrowser } from "./isBrowser";
 import { NormalizedCacheObject, ApolloClient } from "apollo-boost";
+import redirect from "./redirect";
+
+function parseCookies(req?: any, options = {}) {
+  return cookie.parse(
+    req ? req.headers.cookie || "" : document.cookie,
+    options
+  );
+}
 
 export default (App: any) => {
-  return class Apollo extends React.Component {
-    static displayName = "withApollo(App)";
+  return class WithData extends React.Component {
+    static displayName = `WithData(${App.displayName})`;
+    static propTypes = {
+      apolloState: PropTypes.object.isRequired
+    };
     static async getInitialProps(ctx: any) {
-      const { Component, router } = ctx;
+      const {
+        Component,
+        router,
+        ctx: { req, res }
+      } = ctx;
 
-      const apollo = initApollo();
+      const apollo = initApollo(
+        {},
+        {
+          getToken: () => parseCookies(req).qid
+        }
+      );
+
       ctx.ctx.apolloClient = apollo;
 
       let appProps = {};
       if (App.getInitialProps) {
         appProps = await App.getInitialProps(ctx);
+      }
+
+      if (res && res.finished) {
+        // When redirecting, the response is finished.
+        // No point in continuing to render
+        return {};
       }
 
       // Run all GraphQL queries in the component tree
@@ -38,6 +67,9 @@ export default (App: any) => {
           // Handle them in components via the data.error prop:
           // https://www.apollographql.com/docs/react/api/react-apollo.html#graphql-query-data-error
           console.error("Error while running `getDataFromTree`", error);
+          if (error.message.includes("not authenticated")) {
+            redirect(ctx.ctx, "/auth/login");
+          }
         }
 
         // getDataFromTree does not call componentWillUnmount
@@ -58,7 +90,11 @@ export default (App: any) => {
 
     constructor(props: any) {
       super(props);
-      this.apolloClient = initApollo(props.apolloState);
+      this.apolloClient = initApollo(props.apolloState, {
+        getToken: () => {
+          return parseCookies().token;
+        }
+      });
     }
 
     render() {

@@ -8,7 +8,9 @@ import {
   GetAllDepartmentProps,
   DeleteByDepartmentIdProps,
   UpdateByDepartmentIdProps,
-  CreateDepartmentProps
+  CreateDepartmentProps,
+  GetAllUserHOC,
+  GetAllUserProps
 } from "../generated/apolloComponent";
 import { compose } from "react-apollo";
 import { validateDepartmentSchema } from "../shared/validation-schema";
@@ -32,6 +34,7 @@ interface InitialValue {
 }
 
 interface Props {
+  getAllUser: GetAllUserProps;
   getAll: GetAllDepartmentProps;
   deleteBy: DeleteByDepartmentIdProps;
   updateBy: UpdateByDepartmentIdProps;
@@ -51,6 +54,7 @@ interface Props {
 class Department extends Component<Props> {
   render() {
     const {
+      getAllUser: { getAllUser },
       getAll: { getAllDepartment, loading },
       deleteBy,
       updateBy,
@@ -81,27 +85,28 @@ class Department extends Component<Props> {
         f_name: "phone",
         f_type: "text",
         f_label: "Phone"
-      },
-      {
-        f_name: "userID",
-        f_type: "select",
-        f_label: "User",
-        f_options: [
-          {
-            o_id: "",
-            o_title: "Select User"
-          },
-          {
-            o_id: "1",
-            o_title: "User 1"
-          },
-          {
-            o_id: "2",
-            o_title: "User 2"
-          }
-        ]
       }
     ];
+    const userField: FieldsOptions = {
+      f_name: "userID",
+      f_type: "select",
+      f_label: "User",
+      f_options: [
+        {
+          o_id: "",
+          o_title: "Select User"
+        }
+      ]
+    };
+    if (getAllUser) {
+      getAllUser.map(user => {
+        userField.f_options.push({
+          o_id: user.id,
+          o_title: user.name
+        });
+      });
+    }
+    formFields.push(userField);
     callBack(
       getAllDepartment,
       [
@@ -140,6 +145,7 @@ class Department extends Component<Props> {
 }
 
 export default compose(
+  GetAllUserHOC({ name: "getAllUser" }),
   GetAllDepartmentHOC({ name: "getAll" }),
   DeleteByDepartmentIdHOC({ name: "deleteBy" }),
   UpdateByDepartmentIdHOC({ name: "updateBy" }),

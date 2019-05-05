@@ -11,16 +11,11 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Col
+  Col,
+  FormGroup
 } from "reactstrap";
 import RotaTable from "../components/RotaTable/RotaTable";
-import {
-  // GetAllDepartmentComponent,
-  CreateDepartmentComponent,
-  DepartmentBasicFragmentFragment,
-  DeleteByDepartmentIdComponent,
-  UpdateByDepartmentIdComponent
-} from "../generated/apolloComponent";
+import { DepartmentBasicFragmentFragment } from "../generated/apolloComponent";
 import {
   RotaTableItemsTitle,
   RotaTableItemsSimple,
@@ -87,38 +82,47 @@ class Crud extends Component<Props, State> {
       modal: !prevState.modal
     }));
 
+  _setAllState = (
+    data,
+    fields,
+    deleteMutation,
+    updateMutation,
+    createMutation,
+    initialValue,
+    validateDepartmentSchema,
+    formFields
+  ) => {
+    this.setState({
+      data,
+      fields,
+      deleteMutation,
+      updateMutation,
+      createMutation,
+      initialValue,
+      validateDepartmentSchema,
+      formFields
+    });
+  };
+
   _routeData = () => {
     const { route } = this.props;
     const { data } = this.state;
-    // if(data.length)
     switch (route.path) {
       case "/department":
         if (data.length <= 0) {
-          return (
-            <Department
-              callBack={(
-                data,
-                fields,
-                deleteMutation,
-                updateMutation,
-                createMutation,
-                initialValue,
-                validateDepartmentSchema,
-                formFields
-              ) => {
-                this.setState({
-                  data,
-                  fields,
-                  deleteMutation,
-                  updateMutation,
-                  createMutation,
-                  initialValue,
-                  validateDepartmentSchema,
-                  formFields
-                });
-              }}
-            />
-          );
+          return <Department callBack={this._setAllState} />;
+        }
+        return <div />;
+        break;
+      case "/user":
+        if (data.length <= 0) {
+          return <Department callBack={this._setAllState} />;
+        }
+        return <div />;
+        break;
+      case "/role":
+        if (data.length <= 0) {
+          return <Department callBack={this._setAllState} />;
         }
         return <div />;
         break;
@@ -190,7 +194,6 @@ class Crud extends Component<Props, State> {
 
   render() {
     const {
-      departments,
       actionType,
       selectedItem,
       data,
@@ -229,93 +232,11 @@ class Crud extends Component<Props, State> {
                     </div>
                   </Row>
                 </CardHeader>
-                {/* <route.components.get.component>
-                  {({ data, loading }) => {
-                    if (loading) {
-                      return <div />;
-                    }
-                    if (
-                      data &&
-                      data[route.components.get.property] &&
-                      data[route.components.get.property].length > 0
-                    ) {
-                      if (this.state.departments.length <= 0) {
-                        this.setState({
-                          data: data[route.components.get.property]
-                        });
-                      }
-                      return <div />;
-                    }
-                    return <div />;
-                  }}
-                </route.components.get.component> */}
-                {/* <GetAllDepartmentComponent>
-                  {({ data, loading }) => {
-                    if (loading) {
-                      return <div />;
-                    }
-                    if (
-                      data &&
-                      data.getAllDepartment &&
-                      data.getAllDepartment.length > 0
-                    ) {
-                      if (this.state.departments.length <= 0) {
-                        this.setState({ departments: data.getAllDepartment });
-                      }
-                      return <div />;
-                    }
-                    return <div />;
-                  }}
-                </GetAllDepartmentComponent> */}
                 {this._routeData()}
                 {data.length > 0 && (
                   <RotaTable headings={fields.map(f => f.title)}>
                     {data.map(item => {
-                      return (
-                        <tr key={item.id}>
-                          {this._renderItem(item)}
-                          {/* <RotaTableItemsTitle title={title} />
-                          <RotaTableItemsSimple text={email} />
-                          <RotaTableItemsSimple text={phone} />
-                          <DeleteByDepartmentIdComponent>
-                            {mutate => (
-                              <RotaTableItemsActions
-                                id="id"
-                                onDelete={async () => {
-                                  const response = await mutate({
-                                    variables: {
-                                      data: id
-                                    }
-                                  });
-                                  if (
-                                    response &&
-                                    response.data &&
-                                    response.data.deleteByDepartmentID
-                                  ) {
-                                    const { departments } = this.state;
-                                    departments.splice(
-                                      departments.findIndex(d => d.id === id),
-                                      1
-                                    );
-                                    this.setState({
-                                      departments: [...departments]
-                                    });
-                                  }
-                                }}
-                                onUpdate={() => {
-                                  this.setState(
-                                    {
-                                      selectedItem: { id, title, email, phone },
-                                      actionType: "update"
-                                    },
-                                    () => this._toggleModal()
-                                  );
-                                }}
-                              />
-                            )}
-                          </DeleteByDepartmentIdComponent> */}
-                        </tr>
-                      );
+                      return <tr key={item.id}>{this._renderItem(item)}</tr>;
                     })}
                   </RotaTable>
                 )}
@@ -323,207 +244,71 @@ class Crud extends Component<Props, State> {
             </div>
           </Row>
         </Container>
-        <UpdateByDepartmentIdComponent>
-          {mu => (
-            <CreateDepartmentComponent>
-              {m => (
-                <CreateUpdateModal<any>
-                  crud_toggle={this._toggleModal}
-                  crud_isOpen={this.state.modal}
-                  crud_onSubmit={async (
-                    values,
-                    { setSubmitting, resetForm }
-                  ) => {
-                    setSubmitting(true);
-                    if (actionType === "create") {
-                      const response = await createMutation.mutation({
-                        variables: {
-                          data: values
-                        }
-                      });
-                      if (
-                        response &&
-                        response.data &&
-                        response.data[createMutation.field]
-                      ) {
-                        resetForm();
-                        setSubmitting(false);
-                        const { data } = this.state;
-                        this.setState(
-                          {
-                            data: [response.data[createMutation.field], ...data]
-                          },
-                          () => this._toggleModal()
-                        );
-                      }
-                    } else {
-                      const response = await updateMutation.mutation({
-                        variables: {
-                          id: selectedItem.id,
-                          data: values
-                        }
-                      });
-                      if (
-                        response &&
-                        response.data &&
-                        response.data[updateMutation.field]
-                      ) {
-                        resetForm();
-                        setSubmitting(false);
-                        const { data } = this.state;
-                        data[data.findIndex(d => d.id === selectedItem.id)] = {
-                          ...response.data[updateMutation.field]
-                        };
-                        this.setState(
-                          {
-                            data: [...data]
-                          },
-                          () => this._toggleModal()
-                        );
-                      }
-                    }
-                  }}
-                  crud_initialValue={this._calcInitialValue()}
-                  crud_validationSchema={validateDepartmentSchema}
-                  crud_modelTitle={route.title}
-                  crud_type={actionType === "create" ? "Create" : "Update"}
-                  crud_fields={formFields}
-                />
-              )}
-            </CreateDepartmentComponent>
-          )}
-        </UpdateByDepartmentIdComponent>
-        {/* <Modal isOpen={this.state.modal} toggle={this._toggleModal} size="lg">
-          <CreateDepartmentComponent>
-            {mutate => (
-              <Formik<FormValues>
-                initialValues={{
-                  title: "",
-                  email: "",
-                  phone: "",
-                  userID: ""
-                }}
-                onSubmit={async (values, { setSubmitting, resetForm }) => {
-                  setSubmitting(true);
-                  const response = await mutate({
-                    variables: {
-                      data: values
-                    }
-                  });
-                  if (
-                    response &&
-                    response.data &&
-                    response.data.createDepartment &&
-                    response.data.createDepartment.id
-                  ) {
-                    resetForm();
-                    setSubmitting(false);
-                    const { departments } = this.state;
-                    this.setState(
-                      {
-                        departments: [
-                          response.data.createDepartment,
-                          ...departments
-                        ]
-                      },
-                      () => this._toggleModal()
-                    );
-                    console.log(this.state.departments);
-                  }
-                }}
-                validationSchema={validateDepartmentSchema}
-                render={({ isSubmitting }) => {
-                  return (
-                    <Form>
-                      <ModalHeader toggle={this._toggleModal}>
-                        Create Department
-                      </ModalHeader>
-                      <ModalBody>
-                        <div className="pl-lg-4">
-                          <Row>
-                            <Col lg="6">
-                              <Field
-                                name="title"
-                                placeholder="Title"
-                                type="text"
-                                label="Title"
-                                component={InputField}
-                              />
-                            </Col>
-                            <Col lg="6">
-                              <Field
-                                name="email"
-                                placeholder="Email"
-                                type="email"
-                                label="Email"
-                                component={InputField}
-                              />
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col lg="6">
-                              <Field
-                                name="phone"
-                                placeholder="Phone"
-                                type="text"
-                                label="Phone"
-                                component={InputField}
-                              />
-                            </Col>
-                            <Col lg="6">
-                              <Field
-                                name="userID"
-                                placeholder="Select User"
-                                type="select"
-                                componentType="select"
-                                label="User"
-                                component={InputField}
-                              >
-                                <option>Select</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                              </Field>
-                            </Col>
-                          </Row>
-                        </div>
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button
-                          type="submit"
-                          color="primary"
-                          disabled={isSubmitting}
-                        >
-                          Submit
-                        </Button>{" "}
-                        <Button color="secondary" onClick={this._toggleModal}>
-                          Cancel
-                        </Button>
-                      </ModalFooter>
-                    </Form>
-                  );
-                }}
-              />
-            )}
-          </CreateDepartmentComponent>
-        </Modal> */}
+        <CreateUpdateModal<any>
+          crud_toggle={this._toggleModal}
+          crud_isOpen={this.state.modal}
+          crud_onSubmit={async (values, { setSubmitting, resetForm }) => {
+            setSubmitting(true);
+            if (actionType === "create") {
+              const response = await createMutation.mutation({
+                variables: {
+                  data: values
+                }
+              });
+              if (
+                response &&
+                response.data &&
+                response.data[createMutation.field]
+              ) {
+                resetForm();
+                setSubmitting(false);
+                const { data } = this.state;
+                this.setState(
+                  {
+                    data: [response.data[createMutation.field], ...data]
+                  },
+                  () => this._toggleModal()
+                );
+              }
+            } else {
+              const response = await updateMutation.mutation({
+                variables: {
+                  id: selectedItem.id,
+                  data: values
+                }
+              });
+              if (
+                response &&
+                response.data &&
+                response.data[updateMutation.field]
+              ) {
+                resetForm();
+                setSubmitting(false);
+                const { data } = this.state;
+                data[data.findIndex(d => d.id === selectedItem.id)] = {
+                  ...response.data[updateMutation.field]
+                };
+                this.setState(
+                  {
+                    data: [...data]
+                  },
+                  () => this._toggleModal()
+                );
+              }
+            }
+          }}
+          crud_initialValue={this._calcInitialValue()}
+          crud_validationSchema={validateDepartmentSchema}
+          crud_modelTitle={route.title}
+          crud_type={actionType === "create" ? "Create" : "Update"}
+          crud_fields={formFields}
+        />
       </AdminLayout>
     );
   }
 }
 
 export default Crud;
-
-// interface SelectOption {
-//   o_id: string;
-//   o_title: string;
-// }
-
-// interface FieldsOptions {
-//   f_name: string;
-//   f_type: string;
-//   f_label: string;
-//   f_options?: SelectOption[];
-// }
 
 interface ModalProps<T> {
   crud_toggle: () => void;
@@ -569,78 +354,53 @@ class CreateUpdateModal<T> extends Component<ModalProps<T>> {
                             if (f_type === "select") {
                               return (
                                 <Col lg="6" key={index}>
-                                  <Field
-                                    name={f_name}
-                                    placeholder={f_label}
-                                    type={f_type}
-                                    label={f_label}
-                                    component={InputField}
-                                  >
-                                    {f_options &&
-                                      f_options.length > 0 &&
-                                      f_options.map(({ o_id, o_title }, i) => (
-                                        <option key={i} value={o_id}>
-                                          {o_title}
-                                        </option>
-                                      ))}
-                                  </Field>
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor={f_name}
+                                    >
+                                      {f_label}
+                                    </label>
+                                    <Field
+                                      name={f_name}
+                                      placeholder={f_label}
+                                      type={f_type}
+                                      component={InputField}
+                                    >
+                                      {f_options &&
+                                        f_options.length > 0 &&
+                                        f_options.map(
+                                          ({ o_id, o_title }, i) => (
+                                            <option key={i} value={o_id}>
+                                              {o_title}
+                                            </option>
+                                          )
+                                        )}
+                                    </Field>
+                                  </FormGroup>
                                 </Col>
                               );
                             }
                             return (
                               <Col lg="6" key={index}>
-                                <Field
-                                  name={f_name}
-                                  placeholder={f_label}
-                                  type={f_type}
-                                  label={f_label}
-                                  component={InputField}
-                                />
+                                <FormGroup>
+                                  <label
+                                    className="form-control-label"
+                                    htmlFor={f_name}
+                                  >
+                                    {f_label}
+                                  </label>
+                                  <Field
+                                    name={f_name}
+                                    placeholder={f_label}
+                                    type={f_type}
+                                    component={InputField}
+                                  />
+                                </FormGroup>
                               </Col>
                             );
                           }
                         )}
-                      {/* <Col lg="6">
-                        <Field
-                          name="title"
-                          placeholder="Title"
-                          type="text"
-                          label="Title"
-                          component={InputField}
-                        />
-                      </Col>
-                      <Col lg="6">
-                        <Field
-                          name="email"
-                          placeholder="Email"
-                          type="email"
-                          label="Email"
-                          component={InputField}
-                        />
-                      </Col>
-                      <Col lg="6">
-                        <Field
-                          name="phone"
-                          placeholder="Phone"
-                          type="text"
-                          label="Phone"
-                          component={InputField}
-                        />
-                      </Col>
-                      <Col lg="6">
-                        <Field
-                          name="userID"
-                          placeholder="Select User"
-                          type="select"
-                          componentType="select"
-                          label="User"
-                          component={InputField}
-                        >
-                          <option>Select</option>
-                          <option value="1">1</option>
-                          <option value="2">2</option>
-                        </Field>
-                      </Col> */}
                     </Row>
                   </div>
                 </ModalBody>
