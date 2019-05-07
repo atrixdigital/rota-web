@@ -29,7 +29,8 @@ import Department from "../views/Department";
 import { FieldsOptions } from "../interfaces";
 import User from "../views/User";
 import Role from "../views/Role";
-import { withAuthSync } from "../lib/withAuthSync";
+import { withAuth } from "../lib/withAuth";
+import Router from "next/router";
 
 interface Mutation {
   mutation: any;
@@ -52,7 +53,7 @@ interface State {
 }
 
 interface Props {
-  route: DynamicRoutes;
+  query: any;
 }
 
 class Crud extends Component<Props, State> {
@@ -71,21 +72,41 @@ class Crud extends Component<Props, State> {
     formFields: []
   };
 
-  static async getInitialProps({ query, res }) {
+  // static async getInitialProps({ query, res }) {
+  //   console.log(123);
+  //   const routeIndex = dynamicRoutes.findIndex(
+  //     dR => dR.path == `/${query.myRoute}`
+  //   );
+  //   if (routeIndex == -1) {
+  //     res.statusCode = 404;
+  //     return;
+  //   }
+  //   console.log({
+  //     path: `/${query.myRoute}`,
+  //     title: dynamicRoutes[routeIndex].title
+  //   });
+  //   return {
+  //     route: {
+  //       path: `/${query.myRoute}`,
+  //       title: dynamicRoutes[routeIndex].title
+  //     }
+  //   };
+  // }
+
+  _getRoute = () => {
+    const { query } = this.props;
     const routeIndex = dynamicRoutes.findIndex(
       dR => dR.path == `/${query.myRoute}`
     );
     if (routeIndex == -1) {
-      res.statusCode = 404;
+      Router.replace("/dashboard");
       return;
     }
     return {
-      route: {
-        path: `/${query.myRoute}`,
-        title: dynamicRoutes[routeIndex].title
-      }
+      path: `/${query.myRoute}`,
+      title: dynamicRoutes[routeIndex].title
     };
-  }
+  };
 
   _toggleModal = () =>
     this.setState(prevState => ({
@@ -115,31 +136,34 @@ class Crud extends Component<Props, State> {
   };
 
   _routeData = () => {
-    const { route } = this.props;
+    const route = this._getRoute();
 
     const { data } = this.state;
-    switch (route.path) {
-      case "/department":
-        if (data.length <= 0) {
-          return <Department callBack={this._setAllState} />;
-        }
-        return <div />;
-        break;
-      case "/user":
-        if (data.length <= 0) {
-          return <User callBack={this._setAllState} />;
-        }
-        return <div />;
-        break;
-      case "/role":
-        if (data.length <= 0) {
-          return <Role callBack={this._setAllState} />;
-        }
-        return <div />;
-        break;
-      default:
-        return <div />;
+    if (route && route.path) {
+      switch (route.path) {
+        case "/department":
+          if (data.length <= 0) {
+            return <Department callBack={this._setAllState} />;
+          }
+          return <div />;
+          break;
+        case "/user":
+          if (data.length <= 0) {
+            return <User callBack={this._setAllState} />;
+          }
+          return <div />;
+          break;
+        case "/role":
+          if (data.length <= 0) {
+            return <Role callBack={this._setAllState} />;
+          }
+          return <div />;
+          break;
+        default:
+          return <div />;
+      }
     }
+    return <div />;
   };
 
   _renderItem = (item: any) => {
@@ -198,7 +222,16 @@ class Crud extends Component<Props, State> {
     }
     const newVal: any = {};
     for (let v in initialValue) {
-      newVal[v] = selectedItem[v];
+      if (selectedItem.hasOwnProperty(v)) {
+        newVal[v] = selectedItem[v];
+      } else {
+        const splitedKeys = v.replace(/([a-z0-9])([A-Z])/g, "$1 $2").split(" ");
+        newVal[v] =
+          selectedItem[splitedKeys[0]] &&
+          selectedItem[splitedKeys[0]].hasOwnProperty("id")
+            ? selectedItem[splitedKeys[0]].id
+            : null;
+      }
     }
     return newVal;
   };
@@ -214,7 +247,7 @@ class Crud extends Component<Props, State> {
       validateDepartmentSchema,
       formFields
     } = this.state;
-    const { route } = this.props;
+    const route = this._getRoute();
     return (
       <AdminLayout pageTitle="Tables">
         <Header />
@@ -226,7 +259,9 @@ class Crud extends Component<Props, State> {
                 <CardHeader className="border-0">
                   <Row className="align-items-center">
                     <div className="col-11">
-                      <h3 className="mb-0">{route.title}</h3>
+                      <h3 className="mb-0">
+                        {route && route.title && (route.title || "Department")}
+                      </h3>
                     </div>
                     <div className="col text-right">
                       <Button
@@ -319,7 +354,7 @@ class Crud extends Component<Props, State> {
   }
 }
 
-export default withAuthSync(Crud);
+export default withAuth(Crud);
 
 interface ModalProps<T> {
   crud_toggle: () => void;

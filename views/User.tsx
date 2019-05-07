@@ -15,6 +15,7 @@ import {
 import { compose } from "react-apollo";
 import { validateRegisterSchema } from "../shared/validation-schema";
 import { FieldsOptions } from "../interfaces";
+import { generateRelationFieldsData } from "../shared/helpersFunctions";
 
 interface Fields {
   title: string;
@@ -32,6 +33,7 @@ interface InitialValue {
   email: string;
   password: string;
   appproved: string;
+  roleID: string;
 }
 
 interface Props {
@@ -55,6 +57,7 @@ interface Props {
 class User extends Component<Props> {
   render() {
     const {
+      getAllRoleNoAuth: { getAllRoleNoAuth },
       getAll: { getAllUser, loading },
       deleteBy,
       updateBy,
@@ -69,7 +72,8 @@ class User extends Component<Props> {
       lastName: "",
       email: "",
       password: "",
-      appproved: ""
+      appproved: "",
+      roleID: ""
     };
     const formFields: FieldsOptions[] = [
       {
@@ -93,26 +97,22 @@ class User extends Component<Props> {
         f_label: "Password"
       }
     ];
-    // const userField: FieldsOptions = {
-    //   f_name: "userID",
-    //   f_type: "select",
-    //   f_label: "User",
-    //   f_options: [
-    //     {
-    //       o_id: "",
-    //       o_title: "Select User"
-    //     }
-    //   ]
-    // };
-    // if (getAllUser) {
-    //   getAllUser.map(user => {
-    //     userField.f_options.push({
-    //       o_id: user.id,
-    //       o_title: user.name
-    //     });
-    //   });
-    // }
-    // formFields.push(userField);
+    formFields.push(
+      generateRelationFieldsData(
+        {
+          f_name: "roleID",
+          f_type: "select",
+          f_label: "Role",
+          f_options: [
+            {
+              o_id: "",
+              o_title: "Select Role"
+            }
+          ]
+        },
+        getAllRoleNoAuth
+      )
+    );
     callBack(
       getAllUser,
       [

@@ -286,7 +286,23 @@ export type GetAllUserQuery = {
   getAllUser: GetAllUserGetAllUser[];
 };
 
-export type GetAllUserGetAllUser = UserBasicFragmentFragment;
+export type GetAllUserGetAllUser = {
+  __typename?: "User";
+
+  role: Maybe<GetAllUserRole>;
+} & UserBasicFragmentFragment;
+
+export type GetAllUserRole = RoleBasicFragmentFragment;
+
+export type MeVariables = {};
+
+export type MeQuery = {
+  __typename?: "Query";
+
+  me: Maybe<MeMe>;
+};
+
+export type MeMe = UserBasicFragmentFragment;
 
 export type DepartmentBasicFragmentFragment = {
   __typename?: "Department";
@@ -1117,10 +1133,14 @@ export const GetAllUserDocument = gql`
   query GetAllUser {
     getAllUser {
       ...UserBasicFragment
+      role {
+        ...RoleBasicFragment
+      }
     }
   }
 
   ${UserBasicFragmentFragmentDoc}
+  ${RoleBasicFragmentFragmentDoc}
 `;
 export class GetAllUserComponent extends React.Component<
   Partial<ReactApollo.QueryProps<GetAllUserQuery, GetAllUserVariables>>
@@ -1154,4 +1174,46 @@ export function GetAllUserHOC<TProps, TChildProps = any>(
     GetAllUserVariables,
     GetAllUserProps<TChildProps>
   >(GetAllUserDocument, operationOptions);
+}
+export const MeDocument = gql`
+  query Me {
+    me {
+      ...UserBasicFragment
+    }
+  }
+
+  ${UserBasicFragmentFragmentDoc}
+`;
+export class MeComponent extends React.Component<
+  Partial<ReactApollo.QueryProps<MeQuery, MeVariables>>
+> {
+  render() {
+    return (
+      <ReactApollo.Query<MeQuery, MeVariables>
+        query={MeDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type MeProps<TChildProps = any> = Partial<
+  ReactApollo.DataProps<MeQuery, MeVariables>
+> &
+  TChildProps;
+export function MeHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        MeQuery,
+        MeVariables,
+        MeProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    MeQuery,
+    MeVariables,
+    MeProps<TChildProps>
+  >(MeDocument, operationOptions);
 }

@@ -5,6 +5,7 @@
     "dev": "nodemon",
     "build": "rimraf ./dist && next build && tsc --project tsconfig.server.json",
     "start": "node ./dist/production-server/index.js",
+    "start:prod:local": "NODE_ENV=production REACT_APP_SERVER_URL=http://localhost:8080 PORT=3000 node dist/production-server/index.js",
     "generate": "gql-gen --config codegen.yml"
   },
   "dependencies": {

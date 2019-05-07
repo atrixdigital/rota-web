@@ -15,6 +15,7 @@ import {
 import { compose } from "react-apollo";
 import { validateDepartmentSchema } from "../shared/validation-schema";
 import { FieldsOptions } from "../interfaces";
+import { generateRelationFieldsData } from "../shared/helpersFunctions";
 
 interface Fields {
   title: string;
@@ -87,26 +88,23 @@ class Department extends Component<Props> {
         f_label: "Phone"
       }
     ];
-    const userField: FieldsOptions = {
-      f_name: "userID",
-      f_type: "select",
-      f_label: "User",
-      f_options: [
+    formFields.push(
+      generateRelationFieldsData(
         {
-          o_id: "",
-          o_title: "Select User"
-        }
-      ]
-    };
-    if (getAllUser) {
-      getAllUser.map(user => {
-        userField.f_options.push({
-          o_id: user.id,
-          o_title: user.name
-        });
-      });
-    }
-    formFields.push(userField);
+          f_name: "userID",
+          f_type: "select",
+          f_label: "User",
+          f_options: [
+            {
+              o_id: "",
+              o_title: "Select User"
+            }
+          ]
+        },
+        getAllUser,
+        "name"
+      )
+    );
     callBack(
       getAllDepartment,
       [
