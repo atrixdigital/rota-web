@@ -223,20 +223,32 @@ class Sidebar extends React.Component<Props, State> {
                 </InputGroupAddon>
               </InputGroup>
             </Form>
-            <Nav navbar>{this.createLinks(routes)}</Nav>
+            <Nav navbar>
+              <NavItem>
+                <Link href={`/dashboard`}>
+                  <NavLink
+                    onClick={this.closeCollapse}
+                    activeClassName="active"
+                  >
+                    Dashboard
+                  </NavLink>
+                </Link>
+              </NavItem>
+              {this.createLinks(routes)}
+            </Nav>
             <hr className="my-3" />
             <h6 className="navbar-heading text-muted">Documentation</h6>
             <Nav className="mb-md-3" navbar>
               <NavItem>
                 <NavLink href="https://demos.creative-tim.com/argon-dashboard-react/documentation/overview?ref=adr-admin-sidebar">
                   <i className="ni ni-spaceship" />
-                  GraphQL API 
+                  GraphQL API
                 </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink href="https://demos.creative-tim.com/argon-dashboard-react/documentation/colors?ref=adr-admin-sidebar">
                   <i className="ni ni-palette" />
-                 Class Explorer
+                  Class Explorer
                 </NavLink>
               </NavItem>
               {/* <NavItem>
