@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import * as yup from "yup";
 import {
-  GetAllUserHOC,
-  GetAllUserProps,
   DeleteByUserIdHOC,
   UpdateByUserIdHOC,
   CreateUserHOC,
@@ -10,46 +9,38 @@ import {
   DeleteByUserIdProps,
   UpdateByUserIdProps,
   CreateUserProps,
-  UserBasicFragmentFragment
+  UserBasicFragmentFragment,
+  GetAllUserByRoleHOC,
+  GetAllUserByRoleProps
 } from "../generated/apolloComponent";
 import { compose } from "react-apollo";
 import { validateRegisterSchema } from "../shared/validation-schema";
-import { FieldsOptions } from "../interfaces";
+import { FieldsOptions, Crud_Fields, Crud_Mutation } from "../interfaces";
 import { generateRelationFieldsData } from "../shared/helpersFunctions";
-
-interface Fields {
-  title: string;
-  type: string;
-}
-
-interface Mutation {
-  mutation: any;
-  field: string;
-}
 
 interface InitialValue {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  appproved: string;
+  appproved?: string;
   roleID: string;
 }
 
 interface Props {
   getAllRoleNoAuth: GetAllRoleNoAuthProps;
-  getAll: GetAllUserProps;
+  getAll: GetAllUserByRoleProps;
   deleteBy: DeleteByUserIdProps;
   updateBy: UpdateByUserIdProps;
   create: CreateUserProps;
   callBack: (
     data: UserBasicFragmentFragment[],
-    fields: Fields[],
-    deleteBy: Mutation,
-    updateBy: Mutation,
-    create: Mutation,
+    fields: Crud_Fields[],
+    deleteBy: Crud_Mutation,
+    updateBy: Crud_Mutation,
+    create: Crud_Mutation,
     initialValue: InitialValue,
-    validateDepartmentSchema: any,
+    validateDepartmentSchema: yup.ObjectSchema<yup.Shape<{}, InitialValue>>,
     formFields: FieldsOptions[]
   ) => void;
 }
@@ -58,7 +49,7 @@ class User extends Component<Props> {
   render() {
     const {
       getAllRoleNoAuth: { getAllRoleNoAuth },
-      getAll: { getAllUser, loading },
+      getAll: { getAllUserByRole, loading },
       deleteBy,
       updateBy,
       create,
@@ -72,7 +63,6 @@ class User extends Component<Props> {
       lastName: "",
       email: "",
       password: "",
-      appproved: "",
       roleID: ""
     };
     const formFields: FieldsOptions[] = [
@@ -114,16 +104,18 @@ class User extends Component<Props> {
       )
     );
     callBack(
-      getAllUser,
+      getAllUserByRole,
       [
-        { title: "name", type: "title" },
+        { title: "name", type: "title", name: "name" },
         {
           title: "email",
-          type: "text"
+          type: "text",
+          name: "email"
         },
         {
           title: "",
-          type: "action"
+          type: "action",
+          name: ""
         }
       ],
       {
@@ -148,7 +140,7 @@ class User extends Component<Props> {
 
 export default compose(
   GetAllRoleNoAuthHOC({ name: "getAllRoleNoAuth" }),
-  GetAllUserHOC({ name: "getAll" }),
+  GetAllUserByRoleHOC({ name: "getAll" }),
   DeleteByUserIdHOC({ name: "deleteBy" }),
   UpdateByUserIdHOC({ name: "updateBy" }),
   CreateUserHOC({ name: "create" })

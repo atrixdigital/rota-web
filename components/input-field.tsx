@@ -1,6 +1,10 @@
 import React from "react";
 import { FieldProps } from "formik";
 import { Input, InputProps } from "reactstrap";
+import DatePicker, { ReactDatePickerProps } from "react-datepicker";
+
+import "react-datepicker/dist/react-datepicker.css";
+import "./input-field.css";
 
 const InputArea: React.SFC<InputProps> = props => {
   return <Input {...props} className="form-control-alternative" />;
@@ -15,7 +19,24 @@ const SelectArea: React.SFC<InputProps> = props => {
     </Input>
   );
 };
-
+const DateTimePickerArea: React.SFC<ReactDatePickerProps> = props => {
+  return (
+    <DatePicker
+      selected={new Date(props.value)}
+      onChange={dateFromValue => {
+        (props as any).setFieldValue(props.name, new Date(dateFromValue));
+      }}
+      id={props.name}
+      name={props.name}
+      showTimeSelect
+      timeFormat="HH:mm"
+      timeIntervals={15}
+      dateFormat="MMMM d, yyyy h:mm aa"
+      timeCaption="time"
+      className="form-control-alternative form-control"
+    />
+  );
+};
 const TextArea: React.SFC<any> = (
   props: React.DetailedHTMLProps<
     React.TextareaHTMLAttributes<HTMLTextAreaElement>,
@@ -31,15 +52,13 @@ interface InputFieldI {
 
 const InputField: React.SFC<FieldProps<any> & InputFieldI> = ({
   field: { onChange, ...field },
-  form: { touched, errors }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
+  form: { touched, setFieldValue, errors }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
   componentType = "text",
   ...props
 }) => {
-  // console.log(componentType);
-  // console.log(field);
-  // console.log(props);
   const errorMsg = touched[field.name] && errors[field.name];
   let Comp: React.FunctionComponent<any>;
+  let custompProps: any = {};
   switch (componentType) {
     case "textarea":
       Comp = TextArea;
@@ -47,6 +66,7 @@ const InputField: React.SFC<FieldProps<any> & InputFieldI> = ({
     case "text":
     case "password":
     case "email":
+    case "number":
       Comp = InputArea;
       break;
     case "select":
@@ -54,10 +74,12 @@ const InputField: React.SFC<FieldProps<any> & InputFieldI> = ({
       break;
     case "checkbox":
       Comp = CheckBoxArea;
+    case "datetimepicker":
+      custompProps.setFieldValue = setFieldValue;
+      Comp = DateTimePickerArea;
     default:
   }
   // const Comp = componentType === "textarea" ? TextArea : InputArea;
-
   return (
     <React.Fragment>
       {/* <FormGroup>
@@ -72,10 +94,16 @@ const InputField: React.SFC<FieldProps<any> & InputFieldI> = ({
         }`}
         {...props}
         onChange={onChange}
+        {...custompProps}
       />
       {/* </FormGroup> */}
       {errorMsg !== undefined && (
-        <label id="cname-error" className="text-danger small" style={{marginTop:'30px'}} htmlFor={field.name}>
+        <label
+          id="cname-error"
+          className="text-danger small"
+          style={{ marginTop: "30px" }}
+          htmlFor={field.name}
+        >
           {errorMsg}
         </label>
       )}

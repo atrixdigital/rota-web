@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import * as yup from "yup";
 import {
   GetAllRoleHOC,
   DeleteByRoleIdHOC,
@@ -11,18 +12,8 @@ import {
   RoleBasicFragmentFragment
 } from "../generated/apolloComponent";
 import { compose } from "react-apollo";
-import { FieldsOptions } from "../interfaces";
+import { FieldsOptions, Crud_Fields, Crud_Mutation } from "../interfaces";
 import { validateRoleSchema } from "../shared/validation-schema";
-
-interface Fields {
-  title: string;
-  type: string;
-}
-
-interface Mutation {
-  mutation: any;
-  field: string;
-}
 
 interface InitialValue {
   title: string;
@@ -35,12 +26,12 @@ interface Props {
   create: CreateRoleProps;
   callBack: (
     data: RoleBasicFragmentFragment[],
-    fields: Fields[],
-    deleteBy: Mutation,
-    updateBy: Mutation,
-    create: Mutation,
+    fields: Crud_Fields[],
+    deleteBy: Crud_Mutation,
+    updateBy: Crud_Mutation,
+    create: Crud_Mutation,
     initialValue: InitialValue,
-    validateDepartmentSchema: any,
+    validateDepartmentSchema: yup.ObjectSchema<yup.Shape<{}, InitialValue>>,
     formFields: FieldsOptions[]
   ) => void;
 }
@@ -72,11 +63,13 @@ class Role extends Component<Props> {
       [
         {
           title: "title",
-          type: "title"
+          type: "title",
+          name: "title"
         },
         {
           title: "",
-          type: "action"
+          type: "action",
+          name: ""
         }
       ],
       {

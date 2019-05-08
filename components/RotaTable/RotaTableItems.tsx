@@ -20,13 +20,15 @@ export const RotaTableItemsSimple: React.SFC<{ text: string }> = ({ text }) => (
 
 interface Props {
   id: string;
+  onOpen?: () => void;
   onDelete: () => void;
   onUpdate: () => void;
 }
 
 export const RotaTableItemsActions: React.SFC<Props> = ({
   onDelete,
-  onUpdate
+  onUpdate,
+  onOpen
 }) => (
   <td className="text-right">
     <UncontrolledDropdown>
@@ -41,6 +43,16 @@ export const RotaTableItemsActions: React.SFC<Props> = ({
         <i className="fas fa-ellipsis-v" />
       </DropdownToggle>
       <DropdownMenu className="dropdown-menu-arrow" right>
+        {onOpen && typeof onOpen === "function" && (
+          <DropdownItem
+            onClick={e => {
+              e.preventDefault();
+              onDelete();
+            }}
+          >
+            Open
+          </DropdownItem>
+        )}
         <DropdownItem
           onClick={e => {
             e.preventDefault();

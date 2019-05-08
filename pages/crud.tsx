@@ -1,8 +1,8 @@
 import React, { Component } from "react";
+import * as yup from "yup";
 import AdminLayout from "../components/AdminLayout";
 import Header from "../components/Headers/Header";
 import {
-  Card,
   CardHeader,
   Container,
   Row,
@@ -12,10 +12,10 @@ import {
   ModalBody,
   ModalFooter,
   Col,
-  FormGroup
+  FormGroup,
+  Card
 } from "reactstrap";
 import RotaTable from "../components/RotaTable/RotaTable";
-import { DepartmentBasicFragmentFragment } from "../generated/apolloComponent";
 import {
   RotaTableItemsTitle,
   RotaTableItemsSimple,
@@ -24,32 +24,29 @@ import {
 
 import { Field, Formik, Form, FormikActions } from "formik";
 import InputField from "../components/input-field";
-import { dynamicRoutes, DynamicRoutes } from "../shared/dynamicRoutes";
+import { dynamicRoutes } from "../shared/dynamicRoutes";
 import Department from "../views/Department";
-import { FieldsOptions } from "../interfaces";
+import { FieldsOptions, Crud_Fields, Crud_Mutation } from "../interfaces";
 import User from "../views/User";
 import Role from "../views/Role";
 import { withAuth } from "../lib/withAuth";
 import Router from "next/router";
-
-interface Mutation {
-  mutation: any;
-  field: string;
-}
+import Schedule from "../views/Schedule";
 
 interface State {
   modal: boolean;
-  departments: DepartmentBasicFragmentFragment[];
   data: any[];
-  fields: { title: string; type: string }[];
-  deleteMutation: Mutation;
-  updateMutation: Mutation;
-  createMutation: Mutation;
+  fields: Crud_Fields[];
+  deleteMutation: Crud_Mutation;
+  updateMutation: Crud_Mutation;
+  createMutation: Crud_Mutation;
   actionType: string;
-  selectedItem: DepartmentBasicFragmentFragment;
+  selectedItem: any;
   initialValue: any;
-  validateDepartmentSchema: any;
+  validateSchema: yup.ObjectSchema<yup.Shape<{}, any>>;
   formFields: FieldsOptions[];
+  recieveData: boolean;
+  onOpen?: () => void;
 }
 
 interface Props {
@@ -59,7 +56,6 @@ interface Props {
 class Crud extends Component<Props, State> {
   state: Readonly<State> = {
     modal: false,
-    departments: [],
     data: [],
     fields: [],
     deleteMutation: null,
@@ -68,8 +64,9 @@ class Crud extends Component<Props, State> {
     actionType: "create",
     selectedItem: null,
     initialValue: null,
-    validateDepartmentSchema: null,
-    formFields: []
+    validateSchema: null,
+    formFields: [],
+    recieveData: false
   };
 
   // static async getInitialProps({ query, res }) {
@@ -120,8 +117,9 @@ class Crud extends Component<Props, State> {
     updateMutation,
     createMutation,
     initialValue,
-    validateDepartmentSchema,
-    formFields
+    validateSchema,
+    formFields,
+    onOpen
   ) => {
     this.setState({
       data,
@@ -130,34 +128,48 @@ class Crud extends Component<Props, State> {
       updateMutation,
       createMutation,
       initialValue,
-      validateDepartmentSchema,
-      formFields
+      validateSchema,
+      formFields,
+      recieveData: true,
+      onOpen
     });
   };
+
+  _generateNodataMessage = () => (
+    <div style={{ padding: "1.25rem 1.5rem" }}>
+      No {this._getRoute().title} found.
+    </div>
+  );
 
   _routeData = () => {
     const route = this._getRoute();
 
-    const { data } = this.state;
+    const { recieveData } = this.state;
     if (route && route.path) {
       switch (route.path) {
         case "/department":
-          if (data.length <= 0) {
+          if (!recieveData) {
             return <Department callBack={this._setAllState} />;
           }
-          return <div />;
+          return null;
           break;
         case "/user":
-          if (data.length <= 0) {
+          if (!recieveData) {
             return <User callBack={this._setAllState} />;
           }
-          return <div />;
+          return null;
           break;
         case "/role":
-          if (data.length <= 0) {
+          if (!recieveData) {
             return <Role callBack={this._setAllState} />;
           }
-          return <div />;
+          return null;
+          break;
+        case "/schedule":
+          if (!recieveData) {
+            return <Schedule callBack={this._setAllState} />;
+          }
+          return null;
           break;
         default:
           return <div />;
@@ -166,21 +178,70 @@ class Crud extends Component<Props, State> {
     return <div />;
   };
 
+  _months: string[] = [
+    "JAN",
+    "FEB",
+    "MAR",
+    "APR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AUG",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DEC"
+  ];
+
+  _generateFormatedDate = (dateValue: Date) => {
+    return (
+      dateValue.getFullYear() +
+      "-" +
+      this._months[dateValue.getMonth()] +
+      "-" +
+      dateValue.getDate() +
+      " " +
+      dateValue.getHours() +
+      ":" +
+      dateValue.getMinutes() +
+      ":" +
+      dateValue.getSeconds()
+    );
+  };
+
+  _generateTableValue = (value: any, isDate: any) => {
+    const data = isDate
+      ? this._generateFormatedDate(new Date(parseInt(value)))
+      : value;
+    return data;
+  };
+
   _renderItem = (item: any) => {
-    const { fields, deleteMutation } = this.state;
-    return fields.map(({ title, type }, index) => {
+    const { fields, deleteMutation, onOpen } = this.state;
+    return fields.map(({ type, name, isDate }, index) => {
       switch (type) {
         case "title":
-          return <RotaTableItemsTitle key={index} title={item[title]} />;
+          return (
+            <RotaTableItemsTitle
+              key={index}
+              title={this._generateTableValue(item[name], isDate)}
+            />
+          );
           break;
         case "text":
-          return <RotaTableItemsSimple key={index} text={item[title]} />;
+          return (
+            <RotaTableItemsSimple
+              key={index}
+              text={this._generateTableValue(item[name], isDate)}
+            />
+          );
           break;
         case "action":
           return (
             <RotaTableItemsActions
               key={index}
               id="id"
+              onOpen={onOpen}
               onDelete={async () => {
                 const response = await deleteMutation.mutation({
                   variables: {
@@ -244,7 +305,7 @@ class Crud extends Component<Props, State> {
       fields,
       updateMutation,
       createMutation,
-      validateDepartmentSchema,
+      validateSchema,
       formFields
     } = this.state;
     const route = this._getRoute();
@@ -279,12 +340,14 @@ class Crud extends Component<Props, State> {
                   </Row>
                 </CardHeader>
                 {this._routeData()}
-                {data.length > 0 && (
+                {data.length > 0 ? (
                   <RotaTable headings={fields.map(f => f.title)}>
                     {data.map(item => {
                       return <tr key={item.id}>{this._renderItem(item)}</tr>;
                     })}
                   </RotaTable>
+                ) : (
+                  this._generateNodataMessage()
                 )}
               </Card>
             </div>
@@ -295,6 +358,14 @@ class Crud extends Component<Props, State> {
           crud_isOpen={this.state.modal}
           crud_onSubmit={async (values, { setSubmitting, resetForm }) => {
             setSubmitting(true);
+            Object.keys(values).map(value => {
+              if (
+                Object.prototype.toString.call(values[value]) ===
+                "[object Date]"
+              ) {
+                values[value] = new Date(values[value]).getTime().toString();
+              }
+            });
             if (actionType === "create") {
               const response = await createMutation.mutation({
                 variables: {
@@ -344,7 +415,7 @@ class Crud extends Component<Props, State> {
             }
           }}
           crud_initialValue={this._calcInitialValue()}
-          crud_validationSchema={validateDepartmentSchema}
+          crud_validationSchema={validateSchema}
           crud_modelTitle={route.title}
           crud_type={actionType === "create" ? "Create" : "Update"}
           crud_fields={formFields}
@@ -427,6 +498,24 @@ class CreateUpdateModal<T> extends Component<ModalProps<T>> {
                                 </Col>
                               );
                             }
+                            // if(f_type === 'dateTimePicker'){
+                            //   return <Col lg="6" key={index}>
+                            //   <FormGroup>
+                            //     <label
+                            //       className="form-control-label"
+                            //       htmlFor={f_name}
+                            //     >
+                            //       {f_label}
+                            //     </label>
+                            //     <Field
+                            //       name={f_name}
+                            //       placeholder={f_label}
+                            //       type={f_type}
+                            //       component={InputField}
+                            //      />
+                            //   </FormGroup>
+                            // </Col>
+                            // }
                             return (
                               <Col lg="6" key={index}>
                                 <FormGroup>
@@ -440,6 +529,7 @@ class CreateUpdateModal<T> extends Component<ModalProps<T>> {
                                     name={f_name}
                                     placeholder={f_label}
                                     type={f_type}
+                                    componentType={f_type}
                                     component={InputField}
                                   />
                                 </FormGroup>

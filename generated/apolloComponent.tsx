@@ -1,5 +1,9 @@
 export type Maybe<T> = T | null;
 
+export interface GetUserByRoleInput {
+  roleType: string;
+}
+
 export interface CreateUserInput {
   firstName: string;
 
@@ -26,6 +30,26 @@ export interface UpdateUserInput {
   approved?: Maybe<boolean>;
 
   roleID: string;
+}
+
+export interface CreateScheduleInput {
+  startTime: string;
+
+  endTime: string;
+
+  totalHours: number;
+
+  userID: string;
+}
+
+export interface UpdateScheduleInput {
+  startTime: string;
+
+  endTime: string;
+
+  totalHours: number;
+
+  userID: string;
 }
 
 export interface CreateRoleInput {
@@ -184,6 +208,51 @@ export type GetAllRoleNoAuthGetAllRoleNoAuth = {
   title: string;
 };
 
+export type CreateScheduleVariables = {
+  data: CreateScheduleInput;
+};
+
+export type CreateScheduleMutation = {
+  __typename?: "Mutation";
+
+  createSchedule: CreateScheduleCreateSchedule;
+};
+
+export type CreateScheduleCreateSchedule = ScheduleBasicFragmentFragment;
+
+export type DeleteByScheduleIdVariables = {
+  data: string;
+};
+
+export type DeleteByScheduleIdMutation = {
+  __typename?: "Mutation";
+
+  deleteByScheduleID: boolean;
+};
+
+export type UpdateByScheduleIdVariables = {
+  id: string;
+  data: UpdateScheduleInput;
+};
+
+export type UpdateByScheduleIdMutation = {
+  __typename?: "Mutation";
+
+  updateByScheduleID: UpdateByScheduleIdUpdateByScheduleId;
+};
+
+export type UpdateByScheduleIdUpdateByScheduleId = ScheduleBasicFragmentFragment;
+
+export type GetAllScheduleVariables = {};
+
+export type GetAllScheduleQuery = {
+  __typename?: "Query";
+
+  getAllSchedule: GetAllScheduleGetAllSchedule[];
+};
+
+export type GetAllScheduleGetAllSchedule = ScheduleBasicFragmentFragment;
+
 export type ConfirmUserVariables = {
   token: string;
 };
@@ -294,6 +363,24 @@ export type GetAllUserGetAllUser = {
 
 export type GetAllUserRole = RoleBasicFragmentFragment;
 
+export type GetAllUserByRoleVariables = {
+  data?: Maybe<GetUserByRoleInput>;
+};
+
+export type GetAllUserByRoleQuery = {
+  __typename?: "Query";
+
+  getAllUserByRole: GetAllUserByRoleGetAllUserByRole[];
+};
+
+export type GetAllUserByRoleGetAllUserByRole = {
+  __typename?: "User";
+
+  role: Maybe<GetAllUserByRoleRole>;
+} & UserBasicFragmentFragment;
+
+export type GetAllUserByRoleRole = RoleBasicFragmentFragment;
+
 export type MeVariables = {};
 
 export type MeQuery = {
@@ -323,6 +410,22 @@ export type RoleBasicFragmentFragment = {
 
   title: string;
 };
+
+export type ScheduleBasicFragmentFragment = {
+  __typename?: "Schedule";
+
+  id: string;
+
+  startTime: string;
+
+  endTime: string;
+
+  totalHours: number;
+
+  user: Maybe<ScheduleBasicFragmentUser>;
+};
+
+export type ScheduleBasicFragmentUser = UserBasicFragmentFragment;
 
 export type UserBasicFragmentFragment = {
   __typename?: "User";
@@ -377,6 +480,20 @@ export const UserBasicFragmentFragmentDoc = gql`
     password
     appproved
   }
+`;
+
+export const ScheduleBasicFragmentFragmentDoc = gql`
+  fragment ScheduleBasicFragment on Schedule {
+    id
+    startTime
+    endTime
+    totalHours
+    user {
+      ...UserBasicFragment
+    }
+  }
+
+  ${UserBasicFragmentFragmentDoc}
 `;
 
 // ====================================================
@@ -815,6 +932,206 @@ export function GetAllRoleNoAuthHOC<TProps, TChildProps = any>(
     GetAllRoleNoAuthProps<TChildProps>
   >(GetAllRoleNoAuthDocument, operationOptions);
 }
+export const CreateScheduleDocument = gql`
+  mutation CreateSchedule($data: CreateScheduleInput!) {
+    createSchedule(data: $data) {
+      ...ScheduleBasicFragment
+    }
+  }
+
+  ${ScheduleBasicFragmentFragmentDoc}
+`;
+export class CreateScheduleComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<CreateScheduleMutation, CreateScheduleVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<CreateScheduleMutation, CreateScheduleVariables>
+        mutation={CreateScheduleDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type CreateScheduleProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<CreateScheduleMutation, CreateScheduleVariables>
+> &
+  TChildProps;
+export type CreateScheduleMutationFn = ReactApollo.MutationFn<
+  CreateScheduleMutation,
+  CreateScheduleVariables
+>;
+export function CreateScheduleHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        CreateScheduleMutation,
+        CreateScheduleVariables,
+        CreateScheduleProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    CreateScheduleMutation,
+    CreateScheduleVariables,
+    CreateScheduleProps<TChildProps>
+  >(CreateScheduleDocument, operationOptions);
+}
+export const DeleteByScheduleIdDocument = gql`
+  mutation DeleteByScheduleID($data: String!) {
+    deleteByScheduleID(id: $data)
+  }
+`;
+export class DeleteByScheduleIdComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<
+      DeleteByScheduleIdMutation,
+      DeleteByScheduleIdVariables
+    >
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<
+        DeleteByScheduleIdMutation,
+        DeleteByScheduleIdVariables
+      >
+        mutation={DeleteByScheduleIdDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type DeleteByScheduleIdProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<
+    DeleteByScheduleIdMutation,
+    DeleteByScheduleIdVariables
+  >
+> &
+  TChildProps;
+export type DeleteByScheduleIdMutationFn = ReactApollo.MutationFn<
+  DeleteByScheduleIdMutation,
+  DeleteByScheduleIdVariables
+>;
+export function DeleteByScheduleIdHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        DeleteByScheduleIdMutation,
+        DeleteByScheduleIdVariables,
+        DeleteByScheduleIdProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    DeleteByScheduleIdMutation,
+    DeleteByScheduleIdVariables,
+    DeleteByScheduleIdProps<TChildProps>
+  >(DeleteByScheduleIdDocument, operationOptions);
+}
+export const UpdateByScheduleIdDocument = gql`
+  mutation UpdateByScheduleID($id: String!, $data: UpdateScheduleInput!) {
+    updateByScheduleID(id: $id, data: $data) {
+      ...ScheduleBasicFragment
+    }
+  }
+
+  ${ScheduleBasicFragmentFragmentDoc}
+`;
+export class UpdateByScheduleIdComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<
+      UpdateByScheduleIdMutation,
+      UpdateByScheduleIdVariables
+    >
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<
+        UpdateByScheduleIdMutation,
+        UpdateByScheduleIdVariables
+      >
+        mutation={UpdateByScheduleIdDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type UpdateByScheduleIdProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<
+    UpdateByScheduleIdMutation,
+    UpdateByScheduleIdVariables
+  >
+> &
+  TChildProps;
+export type UpdateByScheduleIdMutationFn = ReactApollo.MutationFn<
+  UpdateByScheduleIdMutation,
+  UpdateByScheduleIdVariables
+>;
+export function UpdateByScheduleIdHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        UpdateByScheduleIdMutation,
+        UpdateByScheduleIdVariables,
+        UpdateByScheduleIdProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    UpdateByScheduleIdMutation,
+    UpdateByScheduleIdVariables,
+    UpdateByScheduleIdProps<TChildProps>
+  >(UpdateByScheduleIdDocument, operationOptions);
+}
+export const GetAllScheduleDocument = gql`
+  query GetAllSchedule {
+    getAllSchedule {
+      ...ScheduleBasicFragment
+    }
+  }
+
+  ${ScheduleBasicFragmentFragmentDoc}
+`;
+export class GetAllScheduleComponent extends React.Component<
+  Partial<ReactApollo.QueryProps<GetAllScheduleQuery, GetAllScheduleVariables>>
+> {
+  render() {
+    return (
+      <ReactApollo.Query<GetAllScheduleQuery, GetAllScheduleVariables>
+        query={GetAllScheduleDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type GetAllScheduleProps<TChildProps = any> = Partial<
+  ReactApollo.DataProps<GetAllScheduleQuery, GetAllScheduleVariables>
+> &
+  TChildProps;
+export function GetAllScheduleHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        GetAllScheduleQuery,
+        GetAllScheduleVariables,
+        GetAllScheduleProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    GetAllScheduleQuery,
+    GetAllScheduleVariables,
+    GetAllScheduleProps<TChildProps>
+  >(GetAllScheduleDocument, operationOptions);
+}
 export const ConfirmUserDocument = gql`
   mutation ConfirmUser($token: String!) {
     confirmUser(token: $token)
@@ -1174,6 +1491,54 @@ export function GetAllUserHOC<TProps, TChildProps = any>(
     GetAllUserVariables,
     GetAllUserProps<TChildProps>
   >(GetAllUserDocument, operationOptions);
+}
+export const GetAllUserByRoleDocument = gql`
+  query GetAllUserByRole($data: GetUserByRoleInput) {
+    getAllUserByRole(data: $data) {
+      ...UserBasicFragment
+      role {
+        ...RoleBasicFragment
+      }
+    }
+  }
+
+  ${UserBasicFragmentFragmentDoc}
+  ${RoleBasicFragmentFragmentDoc}
+`;
+export class GetAllUserByRoleComponent extends React.Component<
+  Partial<
+    ReactApollo.QueryProps<GetAllUserByRoleQuery, GetAllUserByRoleVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Query<GetAllUserByRoleQuery, GetAllUserByRoleVariables>
+        query={GetAllUserByRoleDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type GetAllUserByRoleProps<TChildProps = any> = Partial<
+  ReactApollo.DataProps<GetAllUserByRoleQuery, GetAllUserByRoleVariables>
+> &
+  TChildProps;
+export function GetAllUserByRoleHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        GetAllUserByRoleQuery,
+        GetAllUserByRoleVariables,
+        GetAllUserByRoleProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    GetAllUserByRoleQuery,
+    GetAllUserByRoleVariables,
+    GetAllUserByRoleProps<TChildProps>
+  >(GetAllUserByRoleDocument, operationOptions);
 }
 export const MeDocument = gql`
   query Me {

@@ -1,53 +1,56 @@
 import React, { Component } from "react";
 import * as yup from "yup";
 import {
-  DepartmentBasicFragmentFragment,
-  GetAllDepartmentHOC,
-  DeleteByDepartmentIdHOC,
-  UpdateByDepartmentIdHOC,
-  CreateDepartmentHOC,
-  GetAllDepartmentProps,
-  DeleteByDepartmentIdProps,
-  UpdateByDepartmentIdProps,
-  CreateDepartmentProps,
+  GetAllScheduleHOC,
+  DeleteByScheduleIdHOC,
+  UpdateByScheduleIdHOC,
+  CreateScheduleHOC,
+  GetAllScheduleProps,
+  DeleteByScheduleIdProps,
+  UpdateByScheduleIdProps,
+  CreateScheduleProps,
+  ScheduleBasicFragmentFragment,
   GetAllUserByRoleHOC,
   GetAllUserByRoleProps
 } from "../generated/apolloComponent";
 import { compose } from "react-apollo";
-import { validateDepartmentSchema } from "../shared/validation-schema";
 import { FieldsOptions, Crud_Fields, Crud_Mutation } from "../interfaces";
+import { validateScheduleSchema } from "../shared/validation-schema";
 import { generateRelationFieldsData } from "../shared/helpersFunctions";
 
 interface InitialValue {
-  title: string;
-  email: string;
-  phone: string;
+  startTime: Date;
+  endTime: Date;
+  totalHours: number;
   userID: string;
 }
 
 interface Props {
   getAllUserByRole: GetAllUserByRoleProps;
-  getAll: GetAllDepartmentProps;
-  deleteBy: DeleteByDepartmentIdProps;
-  updateBy: UpdateByDepartmentIdProps;
-  create: CreateDepartmentProps;
+  getAll: GetAllScheduleProps;
+  deleteBy: DeleteByScheduleIdProps;
+  updateBy: UpdateByScheduleIdProps;
+  create: CreateScheduleProps;
   callBack: (
-    data: DepartmentBasicFragmentFragment[],
+    data: ScheduleBasicFragmentFragment[],
     fields: Crud_Fields[],
     deleteBy: Crud_Mutation,
     updateBy: Crud_Mutation,
     create: Crud_Mutation,
     initialValue: InitialValue,
     validateDepartmentSchema: yup.ObjectSchema<yup.Shape<{}, InitialValue>>,
-    formFields: FieldsOptions[]
+    formFields: FieldsOptions[],
+    onOpen?: () => void
   ) => void;
 }
 
-class Department extends Component<Props> {
+class Schedule extends Component<Props> {
+  onOpen = () => {};
+
   render() {
     const {
       getAllUserByRole: { getAllUserByRole },
-      getAll: { getAllDepartment, loading },
+      getAll: { getAllSchedule, loading },
       deleteBy,
       updateBy,
       create,
@@ -57,26 +60,26 @@ class Department extends Component<Props> {
       return <div />;
     }
     const initialValue: InitialValue = {
-      title: "",
-      email: "",
-      phone: "",
+      startTime: new Date(),
+      endTime: new Date(),
+      totalHours: 8,
       userID: ""
     };
     const formFields: FieldsOptions[] = [
       {
-        f_name: "title",
-        f_type: "text",
-        f_label: "Title"
+        f_name: "startTime",
+        f_type: "datetimepicker",
+        f_label: "Start Time"
       },
       {
-        f_name: "email",
-        f_type: "email",
-        f_label: "Email"
+        f_name: "endTime",
+        f_type: "datetimepicker",
+        f_label: "End Time"
       },
       {
-        f_name: "phone",
-        f_type: "text",
-        f_label: "Phone"
+        f_name: "totalHours",
+        f_type: "number",
+        f_label: "Total Hours"
       }
     ];
     formFields.push(
@@ -97,18 +100,24 @@ class Department extends Component<Props> {
       )
     );
     callBack(
-      getAllDepartment,
+      getAllSchedule,
       [
-        { title: "title", type: "title", name: "title" },
         {
-          title: "email",
-          type: "text",
-          name: "email"
+          title: "Start Time",
+          type: "title",
+          name: "startTime",
+          isDate: true
         },
         {
-          title: "phone",
+          title: "End Time",
           type: "text",
-          name: "phone"
+          name: "endTime",
+          isDate: true
+        },
+        {
+          title: "Total Hours",
+          type: "text",
+          name: "totalHours"
         },
         {
           title: "",
@@ -118,18 +127,18 @@ class Department extends Component<Props> {
       ],
       {
         mutation: deleteBy,
-        field: "deleteByDepartmentID"
+        field: "deleteByScheduleID"
       },
       {
         mutation: updateBy,
-        field: "updateByDepartmentID"
+        field: "updateByScheduleID"
       },
       {
         mutation: create,
-        field: "createDepartment"
+        field: "createSchedule"
       },
       initialValue,
-      validateDepartmentSchema,
+      validateScheduleSchema,
       formFields
     );
     return <div />;
@@ -137,9 +146,18 @@ class Department extends Component<Props> {
 }
 
 export default compose(
-  GetAllUserByRoleHOC({ name: "getAllUserByRole" }),
-  GetAllDepartmentHOC({ name: "getAll" }),
-  DeleteByDepartmentIdHOC({ name: "deleteBy" }),
-  UpdateByDepartmentIdHOC({ name: "updateBy" }),
-  CreateDepartmentHOC({ name: "create" })
-)(Department);
+  GetAllUserByRoleHOC({
+    name: "getAllUserByRole",
+    options: {
+      variables: {
+        data: {
+          roleType: "Staff"
+        }
+      }
+    }
+  }),
+  GetAllScheduleHOC({ name: "getAll" }),
+  DeleteByScheduleIdHOC({ name: "deleteBy" }),
+  UpdateByScheduleIdHOC({ name: "updateBy" }),
+  CreateScheduleHOC({ name: "create" })
+)(Schedule);

@@ -33,3 +33,9 @@ export const validateLoginSchema = yup.object().shape({
 export const validateRoleSchema = yup.object().shape({
   title: yup.string().required()
 });
+export const validateScheduleSchema = yup.object().shape({
+  startTime: yup.date().required(),
+  endTime: yup.date().required(),
+  totalHours: yup.number().required(),
+  userID: yup.string().required()
+});

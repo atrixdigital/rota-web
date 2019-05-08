@@ -15,5 +15,9 @@ export const dynamicRoutes: DynamicRoutes[] = [
   {
     path: "/role",
     title: "Role"
+  },
+  {
+    path: "/schedule",
+    title: "Schedule"
   }
 ];
