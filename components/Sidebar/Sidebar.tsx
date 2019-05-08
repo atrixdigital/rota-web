@@ -109,13 +109,19 @@ class Sidebar extends React.Component<Props, State> {
             <span className="navbar-toggler-icon" />
           </button>
           {logo ? (
-            <NavbarBrand className="pt-0">
-              <img
+            <Link href="/">
+              <NavbarBrand
+                className="pt-0"
+                style={{ color: "#fff", fontSize: "25px" }}
+              >
+                ROTA
+                {/* <img
                 alt={logo.imgAlt}
                 className="navbar-brand-img"
                 src={logo.imgSrc}
-              />
-            </NavbarBrand>
+              /> */}
+              </NavbarBrand>
+            </Link>
           ) : null}
           <Nav className="align-items-center d-md-none">
             <UncontrolledDropdown nav>

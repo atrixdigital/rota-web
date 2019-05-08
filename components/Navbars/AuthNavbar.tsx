@@ -23,11 +23,12 @@ class AuthNavbar extends React.Component {
         >
           <Container className="px-4">
             <Link href="/">
-              <NavbarBrand>
-                <img
+              <NavbarBrand style={{ color: "#fff", fontSize: "25px" }}>
+                ROTA
+                {/* <img
                   alt="..."
-                  src={require("../../static/assets/img/brand/argon-react-white.png")}
-                />
+                  src={require("../../static/assets/img/brand/logo.jpeg")}
+                /> */}
               </NavbarBrand>
             </Link>
             <button className="navbar-toggler" id="navbar-collapse-main">
@@ -38,11 +39,15 @@ class AuthNavbar extends React.Component {
                 <Row>
                   <Col className="collapse-brand" xs="6">
                     <Link href="/">
-                      <a>
-                        <img
+                      <a
+                        className="navbar-brand"
+                        style={{ color: "#fff", fontSize: "25px" }}
+                      >
+                        ROTA
+                        {/* <img
                           alt="..."
-                          src={require("../../static/assets/img/brand/argon-react.png")}
-                        />
+                          src={require("../../static/assets/img/brand/logo.jpeg")}
+                        /> */}
                       </a>
                     </Link>
                   </Col>
@@ -57,7 +62,7 @@ class AuthNavbar extends React.Component {
                   </Col>
                 </Row>
               </div>
-              <Nav className="ml-auto" navbar>
+              {/* <Nav className="ml-auto" navbar>
                 <NavItem>
                   <Link href="/dashboard">
                     <NavLink className="nav-link-icon">
@@ -90,7 +95,7 @@ class AuthNavbar extends React.Component {
                     </NavLink>
                   </Link>
                 </NavItem>
-              </Nav>
+              </Nav> */}
             </UncontrolledCollapse>
           </Container>
         </Navbar>

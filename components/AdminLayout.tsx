@@ -18,7 +18,7 @@ class AdminLayout extends Component<Props> {
           routes={dynamicRoutes}
           logo={{
             innerLink: "/dashboard",
-            imgSrc: require("../static/assets/img/brand/argon-react.png"),
+            imgSrc: require("../static/assets/img/brand/logo.jpeg"),
             imgAlt: "..."
           }}
         />
