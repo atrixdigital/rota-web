@@ -112,7 +112,7 @@ class Sidebar extends React.Component<Props, State> {
             <Link href="/">
               <NavbarBrand
                 className="pt-0"
-                style={{ color: "#fff", fontSize: "25px" }}
+                style={{ color: "#000", fontSize: "25px" }}
               >
                 ROTA
                 {/* <img
