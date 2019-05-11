@@ -1,21 +1,22 @@
 import React, { Component } from "react";
 import { Container } from "reactstrap";
-import Sidebar from "./Sidebar/Sidebar";
-import AdminNavbar from "./Navbars/AdminNavbar";
+import { MeMe } from "../generated/apolloComponent";
 import AdminFooter from "./Footers/AdminFooter";
-import { dynamicRoutes } from "../shared/dynamicRoutes";
+import AdminNavbar from "./Navbars/AdminNavbar";
+import Sidebar from "./Sidebar/Sidebar";
 
 interface Props {
   pageTitle?: string;
+  me?: MeMe;
 }
 
 class AdminLayout extends Component<Props> {
   render() {
-    const { pageTitle } = this.props;
+    const { pageTitle, me } = this.props;
     return (
       <>
         <Sidebar
-          routes={dynamicRoutes}
+          me={me}
           logo={{
             innerLink: "/dashboard",
             imgSrc: require("../static/assets/img/brand/logo.jpeg"),

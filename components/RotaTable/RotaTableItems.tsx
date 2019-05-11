@@ -19,7 +19,6 @@ export const RotaTableItemsSimple: React.SFC<{ text: string }> = ({ text }) => (
 );
 
 interface Props {
-  id: string;
   onOpen?: () => void;
   onDelete: () => void;
   onUpdate: () => void;

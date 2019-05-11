@@ -1,32 +1,31 @@
-import React from "react";
 import Link from "next/link";
-
+import Router from "next/router";
+import React from "react";
 // reactstrap components
 import {
-  DropdownMenu,
-  DropdownItem,
-  UncontrolledDropdown,
-  DropdownToggle,
-  Form,
-  FormGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Input,
-  InputGroup,
-  Navbar,
-  Nav,
   Container,
-  Media
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Media,
+  Nav,
+  Navbar,
+  UncontrolledDropdown
 } from "reactstrap";
-import { LogoutComponent } from "../../generated/apolloComponent";
-import Router from "next/router";
+import { LogoutComponent, MeMe } from "../../generated/apolloComponent";
 
 interface Props {
   brandText: string;
+  me?: MeMe;
 }
 
 class AdminNavbar extends React.Component<Props> {
   render() {
+    const { me } = this.props;
+    let nameAvatar: string = "";
+    if (me) {
+      nameAvatar = me.firstName[0].toUpperCase() + me.lastName[0].toUpperCase();
+    }
     return (
       <>
         <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
@@ -36,7 +35,7 @@ class AdminNavbar extends React.Component<Props> {
                 {this.props.brandText}
               </a>
             </Link>
-            <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
+            {/* <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
               <FormGroup className="mb-0">
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
@@ -47,20 +46,21 @@ class AdminNavbar extends React.Component<Props> {
                   <Input placeholder="Search" type="text" />
                 </InputGroup>
               </FormGroup>
-            </Form>
+            </Form> */}
             <Nav className="align-items-center d-none d-md-flex" navbar>
               <UncontrolledDropdown nav>
                 <DropdownToggle className="pr-0" nav>
                   <Media className="align-items-center">
                     <span className="avatar avatar-sm rounded-circle">
-                      <img
+                      {nameAvatar}
+                      {/* <img
                         alt="..."
                         src={require("../../static/assets/img/theme/team-4-800x800.jpg")}
-                      />
+                      /> */}
                     </span>
                     <Media className="ml-2 d-none d-lg-block">
                       <span className="mb-0 text-sm font-weight-bold">
-                        Jessica Jones
+                        {me && me.name}
                       </span>
                     </Media>
                   </Media>
@@ -69,13 +69,13 @@ class AdminNavbar extends React.Component<Props> {
                   <DropdownItem className="noti-title" header tag="div">
                     <h6 className="text-overflow m-0">Rota Dashboard</h6>
                   </DropdownItem>
-                  <Link href="/admin/user-profile">
+                  <Link href="/dashboard">
                     <DropdownItem>
                       <i className="ni ni-single-02" />
                       <span>My profile</span>
                     </DropdownItem>
                   </Link>
-                  <Link href="/admin/user-profile">
+                  {/* <Link href="/admin/user-profile">
                     <DropdownItem>
                       <i className="ni ni-settings-gear-65" />
                       <span>Settings</span>
@@ -91,8 +91,8 @@ class AdminNavbar extends React.Component<Props> {
                     <DropdownItem>
                       <i className="ni ni-support-16" />
                       <span>Support</span>
-                    </DropdownItem>
-                  </Link>
+                    </DropdownItem> 
+    </Link> */}
 
                   <DropdownItem divider />
                   <LogoutComponent>

@@ -1,7 +1,13 @@
 export type Maybe<T> = T | null;
 
 export interface GetUserByRoleInput {
-  roleType: string;
+  roleType?: Maybe<string>;
+}
+
+export interface GetUserByFilterInput {
+  roleType?: Maybe<string>;
+
+  approved?: Maybe<boolean>;
 }
 
 export interface CreateUserInput {
@@ -253,6 +259,17 @@ export type GetAllScheduleQuery = {
 
 export type GetAllScheduleGetAllSchedule = ScheduleBasicFragmentFragment;
 
+export type ApprovedUserVariables = {
+  approved: boolean;
+  userID: string;
+};
+
+export type ApprovedUserMutation = {
+  __typename?: "Mutation";
+
+  approvedUser: boolean;
+};
+
 export type ConfirmUserVariables = {
   token: string;
 };
@@ -293,7 +310,7 @@ export type LoginVariables = {
 export type LoginMutation = {
   __typename?: "Mutation";
 
-  login: Maybe<LoginLogin>;
+  login: LoginLogin;
 };
 
 export type LoginLogin = {
@@ -363,6 +380,24 @@ export type GetAllUserGetAllUser = {
 
 export type GetAllUserRole = RoleBasicFragmentFragment;
 
+export type GetAllUserByFilterVariables = {
+  data?: Maybe<GetUserByFilterInput>;
+};
+
+export type GetAllUserByFilterQuery = {
+  __typename?: "Query";
+
+  getAllUserByFilter: GetAllUserByFilterGetAllUserByFilter[];
+};
+
+export type GetAllUserByFilterGetAllUserByFilter = {
+  __typename?: "User";
+
+  role: Maybe<GetAllUserByFilterRole>;
+} & UserBasicFragmentFragment;
+
+export type GetAllUserByFilterRole = RoleBasicFragmentFragment;
+
 export type GetAllUserByRoleVariables = {
   data?: Maybe<GetUserByRoleInput>;
 };
@@ -389,7 +424,13 @@ export type MeQuery = {
   me: Maybe<MeMe>;
 };
 
-export type MeMe = UserBasicFragmentFragment;
+export type MeMe = {
+  __typename?: "User";
+
+  role: Maybe<MeRole>;
+} & UserBasicFragmentFragment;
+
+export type MeRole = RoleBasicFragmentFragment;
 
 export type DepartmentBasicFragmentFragment = {
   __typename?: "Department";
@@ -1132,6 +1173,50 @@ export function GetAllScheduleHOC<TProps, TChildProps = any>(
     GetAllScheduleProps<TChildProps>
   >(GetAllScheduleDocument, operationOptions);
 }
+export const ApprovedUserDocument = gql`
+  mutation ApprovedUser($approved: Boolean!, $userID: String!) {
+    approvedUser(approved: $approved, userID: $userID)
+  }
+`;
+export class ApprovedUserComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<ApprovedUserMutation, ApprovedUserVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<ApprovedUserMutation, ApprovedUserVariables>
+        mutation={ApprovedUserDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type ApprovedUserProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<ApprovedUserMutation, ApprovedUserVariables>
+> &
+  TChildProps;
+export type ApprovedUserMutationFn = ReactApollo.MutationFn<
+  ApprovedUserMutation,
+  ApprovedUserVariables
+>;
+export function ApprovedUserHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        ApprovedUserMutation,
+        ApprovedUserVariables,
+        ApprovedUserProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    ApprovedUserMutation,
+    ApprovedUserVariables,
+    ApprovedUserProps<TChildProps>
+  >(ApprovedUserDocument, operationOptions);
+}
 export const ConfirmUserDocument = gql`
   mutation ConfirmUser($token: String!) {
     confirmUser(token: $token)
@@ -1492,6 +1577,54 @@ export function GetAllUserHOC<TProps, TChildProps = any>(
     GetAllUserProps<TChildProps>
   >(GetAllUserDocument, operationOptions);
 }
+export const GetAllUserByFilterDocument = gql`
+  query GetAllUserByFilter($data: GetUserByFilterInput) {
+    getAllUserByFilter(data: $data) {
+      ...UserBasicFragment
+      role {
+        ...RoleBasicFragment
+      }
+    }
+  }
+
+  ${UserBasicFragmentFragmentDoc}
+  ${RoleBasicFragmentFragmentDoc}
+`;
+export class GetAllUserByFilterComponent extends React.Component<
+  Partial<
+    ReactApollo.QueryProps<GetAllUserByFilterQuery, GetAllUserByFilterVariables>
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Query<GetAllUserByFilterQuery, GetAllUserByFilterVariables>
+        query={GetAllUserByFilterDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type GetAllUserByFilterProps<TChildProps = any> = Partial<
+  ReactApollo.DataProps<GetAllUserByFilterQuery, GetAllUserByFilterVariables>
+> &
+  TChildProps;
+export function GetAllUserByFilterHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        GetAllUserByFilterQuery,
+        GetAllUserByFilterVariables,
+        GetAllUserByFilterProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    GetAllUserByFilterQuery,
+    GetAllUserByFilterVariables,
+    GetAllUserByFilterProps<TChildProps>
+  >(GetAllUserByFilterDocument, operationOptions);
+}
 export const GetAllUserByRoleDocument = gql`
   query GetAllUserByRole($data: GetUserByRoleInput) {
     getAllUserByRole(data: $data) {
@@ -1544,10 +1677,14 @@ export const MeDocument = gql`
   query Me {
     me {
       ...UserBasicFragment
+      role {
+        ...RoleBasicFragment
+      }
     }
   }
 
   ${UserBasicFragmentFragmentDoc}
+  ${RoleBasicFragmentFragmentDoc}
 `;
 export class MeComponent extends React.Component<
   Partial<ReactApollo.QueryProps<MeQuery, MeVariables>>

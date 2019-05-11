@@ -1,29 +1,30 @@
-import * as React from "react";
 import Link from "next/link";
+import * as React from "react";
 // nodejs library to set properties for components
-
 // reactstrap components
 import {
+  Col,
   Collapse,
-  DropdownMenu,
+  Container,
   DropdownItem,
-  UncontrolledDropdown,
+  DropdownMenu,
   DropdownToggle,
   Form,
   Input,
+  InputGroup,
   InputGroupAddon,
   InputGroupText,
-  InputGroup,
   Media,
-  NavbarBrand,
+  Nav,
   Navbar,
+  NavbarBrand,
   NavItem,
   NavLink,
-  Nav,
-  Container,
   Row,
-  Col
+  UncontrolledDropdown
 } from "reactstrap";
+import { MeMe } from "../../generated/apolloComponent";
+import { isAdmin } from "../../shared/helpersFunctions";
 
 interface State {
   collapseOpen: boolean;
@@ -37,23 +38,14 @@ interface Logo {
 }
 
 interface Props {
-  routes?: any[];
   logo: Logo;
+  me?: MeMe;
 }
 
 class Sidebar extends React.Component<Props, State> {
   state = {
     collapseOpen: false
   };
-  // constructor(props) {
-  //   super(props);
-  //   // this.activeRoute.bind(this);
-  // }
-  // // verifies if routeName is the one active (in browser input)
-  // activeRoute(routeName) {
-  //   return this.props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
-  // }
-  // toggles collapse between opened and closed (true/false)
   toggleCollapse = () => {
     this.setState({
       collapseOpen: !this.state.collapseOpen
@@ -65,35 +57,8 @@ class Sidebar extends React.Component<Props, State> {
       collapseOpen: false
     });
   };
-  // creates the links that appear in the left menu / Sidebar
-  createLinks = routes => {
-    return routes.map((prop, key) => {
-      return (
-        <NavItem key={key}>
-          <Link href={`/crud${prop.path}`}>
-            <NavLink onClick={this.closeCollapse} activeClassName="active">
-              {prop.icon && <i className={prop.icon} />}
-              {prop.title}
-            </NavLink>
-          </Link>
-        </NavItem>
-      );
-    });
-  };
   render() {
-    const { routes, logo } = this.props;
-    // let navbarBrandProps;
-    // if (logo && logo.innerLink) {
-    //   navbarBrandProps = {
-    //     to: logo.innerLink,
-    //     tag: Link
-    //   };
-    // } else if (logo && logo.outterLink) {
-    //   navbarBrandProps = {
-    //     href: logo.outterLink,
-    //     target: "_blank"
-    //   };
-    // }
+    const { logo, me } = this.props;
     return (
       <Navbar
         className="navbar-vertical fixed-left navbar-light bg-white"
@@ -240,9 +205,55 @@ class Sidebar extends React.Component<Props, State> {
                   </NavLink>
                 </Link>
               </NavItem>
-              {this.createLinks(routes)}
+              {isAdmin(me) ? (
+                <>
+                  <NavItem>
+                    <Link href={`/active-managers`}>
+                      <NavLink onClick={this.closeCollapse}>
+                        Active Rota Managers
+                      </NavLink>
+                    </Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link href={`/inactive-managers`}>
+                      <NavLink onClick={this.closeCollapse}>
+                        Inactive Rota Managers
+                      </NavLink>
+                    </Link>
+                  </NavItem>
+                </>
+              ) : null}
+              <NavItem>
+                <Link href={`/active-staffs`}>
+                  <NavLink onClick={this.closeCollapse}>
+                    Active Rota Staffs
+                  </NavLink>
+                </Link>
+              </NavItem>
+              <NavItem>
+                <Link href={`/inactive-staffs`}>
+                  <NavLink onClick={this.closeCollapse}>
+                    Inactive Rota Staffs
+                  </NavLink>
+                </Link>
+              </NavItem>
+              <NavItem>
+                <Link href={`/departments`}>
+                  <NavLink onClick={this.closeCollapse}>Departments</NavLink>
+                </Link>
+              </NavItem>
+              <NavItem>
+                <Link href={`/roles`}>
+                  <NavLink onClick={this.closeCollapse}>Roles</NavLink>
+                </Link>
+              </NavItem>
+              <NavItem>
+                <Link href={`/schedules`}>
+                  <NavLink onClick={this.closeCollapse}>Schedules</NavLink>
+                </Link>
+              </NavItem>
             </Nav>
-            <hr className="my-3" />
+            {/* <hr className="my-3" />
             <h6 className="navbar-heading text-muted">Documentation</h6>
             <Nav className="mb-md-3" navbar>
               <NavItem>
@@ -257,13 +268,13 @@ class Sidebar extends React.Component<Props, State> {
                   Class Explorer
                 </NavLink>
               </NavItem>
-              {/* <NavItem>
+              <NavItem>
                 <NavLink href="https://demos.creative-tim.com/argon-dashboard-react/documentation/alerts?ref=adr-admin-sidebar">
                   <i className="ni ni-ui-04" />
                   Components
                 </NavLink>
-              </NavItem> */}
-            </Nav>
+              </NavItem>
+            </Nav> */}
           </Collapse>
         </Container>
       </Navbar>

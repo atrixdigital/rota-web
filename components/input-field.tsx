@@ -1,9 +1,8 @@
-import React from "react";
 import { FieldProps } from "formik";
-import { Input, InputProps } from "reactstrap";
+import React from "react";
 import DatePicker, { ReactDatePickerProps } from "react-datepicker";
-
 import "react-datepicker/dist/react-datepicker.css";
+import { Input, InputProps } from "reactstrap";
 import "./input-field.css";
 
 const InputArea: React.SFC<InputProps> = props => {

@@ -1,37 +1,36 @@
-import React, { Component } from "react";
-import AdminLayout from "../components/AdminLayout";
-// node.js library that concatenates classes (strings)
-import classnames from "classnames";
 // javascipt plugin for creating charts
 import Chart from "chart.js";
+// node.js library that concatenates classes (strings)
+import classnames from "classnames";
+import React, { Component } from "react";
 // react plugin used to create charts
-import { Line, Bar } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 // reactstrap components
 import {
   Button,
   Card,
-  CardHeader,
   CardBody,
+  CardHeader,
+  Col,
+  Container,
+  Nav,
   NavItem,
   NavLink,
-  Nav,
   Progress,
-  Table,
-  Container,
   Row,
-  Col
+  Table
 } from "reactstrap";
-
+import AdminLayout from "../components/AdminLayout";
+import Header from "../components/Headers/Header";
+import { MeMe } from "../generated/apolloComponent";
+import { withAuth } from "../lib/withAuth";
 // core components
 import {
-  chartOptions,
-  parseOptions,
   chartExample1,
-  chartExample2
+  chartExample2,
+  chartOptions,
+  parseOptions
 } from "../variables/charts";
-
-import Header from "../components/Headers/Header";
-import { withAuth } from "../lib/withAuth";
 
 interface State {
   activeNav: number;
@@ -44,7 +43,11 @@ declare global {
   }
 }
 
-class DashBoard extends Component<{}, State> {
+interface Props {
+  me?: MeMe;
+}
+
+class DashBoard extends Component<Props, State> {
   state: Readonly<State> = {
     activeNav: 1,
     chartExample1Data: "data1"
@@ -71,8 +74,9 @@ class DashBoard extends Component<{}, State> {
     // this.chartReference.update();
   };
   render() {
+    const { me } = this.props;
     return (
-      <AdminLayout>
+      <AdminLayout pageTitle="Dashboard" me={me}>
         <Header showCards={true} />
         {/* Page content */}
         <Container className="mt--7" fluid>

@@ -82,31 +82,14 @@ const withExportPath = (nextConfig = {}) => {
         "/auth/login": { page: "/auth" },
         "/auth/register": { page: "/auth" },
         "/dashboard": { page: "/dashboard" },
-        "/check-email": { page: "/check-email" }
+        "/check-email": { page: "/check-email" },
+        "/departments": { page: "/departments" },
+        "/active-managers": { page: "/active-managers" },
+        "/inactive-managers": { page: "/inactive-managers" },
+        "/active-staffs": { page: "/active-staffs" },
+        "/inactive-staffs": { page: "/inactive-staffs" },
+        "/roles": { page: "/roles" }
       };
-
-      const dynamicRoute = [
-        {
-          path: "department",
-          title: "Department"
-        },
-        {
-          path: "user",
-          title: "User"
-        },
-        {
-          path: "role",
-          title: "Role"
-        }
-      ];
-      dynamicRoute.map(r => {
-        pages[`/crud/${r.path}`] = {
-          page: "/crud",
-          query: {
-            myRoute: r.path
-          }
-        };
-      });
 
       // const response = await getData();
 

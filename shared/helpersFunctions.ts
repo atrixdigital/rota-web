@@ -1,17 +1,5 @@
-import { FieldsOptions } from "../interfaces";
+import { MeMe } from "../generated/apolloComponent";
 
-export const generateRelationFieldsData = (
-  fields: FieldsOptions,
-  relationData: any[],
-  titleField: string = "title"
-) => {
-  if (relationData) {
-    relationData.map(data => {
-      fields.f_options.push({
-        o_id: data.id,
-        o_title: data[titleField]
-      });
-    });
-  }
-  return fields;
-};
+export const isAdmin = (me?: MeMe): boolean =>
+  me && !!me.role && me.role.title === "Admin";
+export const isManager = (me?: MeMe): boolean => !isAdmin(me);

@@ -1,19 +1,16 @@
 import App, { Container } from "next/app";
-
-// import "../assets/vendor/nucleo/css/nucleo.css";
-// import "../assets/vendor/@fortawesome/fontawesome-free/css/all.min.css";
-// import "../assets/scss/argon-dashboard-react.scss";
-
-import "../static/assets/vendor/nucleo/css/nucleo.css";
-import "../static/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css";
-import "../static/assets/css/argon-dashboard-react.css";
-
+import { withRouter, WithRouterProps } from "next/router";
+import { ApolloProvider, compose } from "react-apollo";
+import "react-toggle/style.css";
 // @ts-ignore
 import TopBarProgress from "react-topbar-progress-indicator";
-
-import { ApolloProvider, compose } from "react-apollo";
 import withApollo from "../lib/withApollo";
-import { withRouter, WithRouterProps } from "next/router";
+import "../static/assets/css/argon-dashboard-react.css";
+
+import "../static/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css";
+import "../static/assets/vendor/nucleo/css/nucleo.css";
+
+import "../static/assets/css/style.css";
 
 interface State {
   isLoading: boolean;

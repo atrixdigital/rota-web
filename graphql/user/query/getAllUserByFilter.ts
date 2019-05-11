@@ -2,9 +2,9 @@ import gql from "graphql-tag";
 import { RoleBasicFragment } from "../../role/fragments";
 import { UserBasicFragment } from "../fragements";
 
-export const meQuery = gql`
-  query Me {
-    me {
+export const getAllUserByFilter = gql`
+  query GetAllUserByFilter($data: GetUserByFilterInput) {
+    getAllUserByFilter(data: $data) {
       ...UserBasicFragment
       role {
         ...RoleBasicFragment
