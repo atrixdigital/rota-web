@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Container } from "reactstrap";
 import { MeMe } from "../generated/apolloComponent";
 import AdminFooter from "./Footers/AdminFooter";
+import Layout from "./Layout";
 import AdminNavbar from "./Navbars/AdminNavbar";
 import Sidebar from "./Sidebar/Sidebar";
 
@@ -14,7 +15,7 @@ class AdminLayout extends Component<Props> {
   render() {
     const { pageTitle, me } = this.props;
     return (
-      <>
+      <Layout>
         <Sidebar
           me={me}
           logo={{
@@ -33,7 +34,7 @@ class AdminLayout extends Component<Props> {
             <AdminFooter />
           </Container>
         </div>
-      </>
+      </Layout>
     );
   }
 }

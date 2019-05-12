@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Router from "next/router";
 import * as React from "react";
 // nodejs library to set properties for components
 // reactstrap components
@@ -23,7 +24,7 @@ import {
   Row,
   UncontrolledDropdown
 } from "reactstrap";
-import { MeMe } from "../../generated/apolloComponent";
+import { LogoutComponent, MeMe } from "../../generated/apolloComponent";
 import { isAdmin } from "../../shared/helpersFunctions";
 
 interface State {
@@ -59,6 +60,10 @@ class Sidebar extends React.Component<Props, State> {
   };
   render() {
     const { logo, me } = this.props;
+    let nameAvatar: string = "";
+    if (me) {
+      nameAvatar = me.firstName[0].toUpperCase() + me.lastName[0].toUpperCase();
+    }
     return (
       <Navbar
         className="navbar-vertical fixed-left navbar-light bg-white"
@@ -89,7 +94,7 @@ class Sidebar extends React.Component<Props, State> {
             </Link>
           ) : null}
           <Nav className="align-items-center d-md-none">
-            <UncontrolledDropdown nav>
+            {/* <UncontrolledDropdown nav>
               <DropdownToggle nav className="nav-link-icon">
                 <i className="ni ni-bell-55" />
               </DropdownToggle>
@@ -103,23 +108,30 @@ class Sidebar extends React.Component<Props, State> {
                 <DropdownItem divider />
                 <DropdownItem>Something else here</DropdownItem>
               </DropdownMenu>
-            </UncontrolledDropdown>
+            </UncontrolledDropdown> */}
             <UncontrolledDropdown nav>
               <DropdownToggle nav>
                 <Media className="align-items-center">
                   <span className="avatar avatar-sm rounded-circle">
-                    <img
+                    {nameAvatar}
+                    {/* <img
                       alt="..."
                       src={require("../../static/assets/img/theme/team-1-800x800.jpg")}
-                    />
+                    /> */}
                   </span>
                 </Media>
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-arrow" right>
                 <DropdownItem className="noti-title" header tag="div">
-                  <h6 className="text-overflow m-0">Welcome!</h6>
+                  <h6 className="text-overflow m-0">Rota Dashboard</h6>
                 </DropdownItem>
-                <Link href="/admin/user-profile">
+                <Link href="/dashboard">
+                  <DropdownItem>
+                    <i className="ni ni-single-02" />
+                    <span>My profile</span>
+                  </DropdownItem>
+                </Link>
+                {/* <Link href="/admin/user-profile">
                   <DropdownItem>
                     <i className="ni ni-single-02" />
                     <span>My profile</span>
@@ -147,7 +159,23 @@ class Sidebar extends React.Component<Props, State> {
                 <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
                   <i className="ni ni-user-run" />
                   <span>Logout</span>
-                </DropdownItem>
+                </DropdownItem> */}
+                <DropdownItem divider />
+                <LogoutComponent>
+                  {mutate => (
+                    <DropdownItem
+                      href=""
+                      onClick={async e => {
+                        e.preventDefault();
+                        await mutate();
+                        Router.push("/auth/login");
+                      }}
+                    >
+                      <i className="ni ni-user-run" />
+                      <span>Logout</span>
+                    </DropdownItem>
+                  )}
+                </LogoutComponent>
               </DropdownMenu>
             </UncontrolledDropdown>
           </Nav>

@@ -1,36 +1,24 @@
 // javascipt plugin for creating charts
 import Chart from "chart.js";
-// node.js library that concatenates classes (strings)
-import classnames from "classnames";
+import Link from "next/link";
 import React, { Component } from "react";
-// react plugin used to create charts
-import { Bar, Line } from "react-chartjs-2";
 // reactstrap components
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Container,
-  Nav,
-  NavItem,
-  NavLink,
-  Progress,
-  Row,
-  Table
-} from "reactstrap";
+import { Button, Card, CardHeader, Col, Container, Row } from "reactstrap";
 import AdminLayout from "../components/AdminLayout";
 import Header from "../components/Headers/Header";
-import { MeMe } from "../generated/apolloComponent";
+import Loader from "../components/Loader";
+import RotaTable from "../components/RotaTable/RotaTable";
+import {
+  RotaTableItemsSimple,
+  RotaTableItemsTitle
+} from "../components/RotaTable/RotaTableItems";
+import {
+  GetAllUserByFilterComponent,
+  MeMe
+} from "../generated/apolloComponent";
 import { withAuth } from "../lib/withAuth";
 // core components
-import {
-  chartExample1,
-  chartExample2,
-  chartOptions,
-  parseOptions
-} from "../variables/charts";
+import { chartOptions, parseOptions } from "../variables/charts";
 
 interface State {
   activeNav: number;
@@ -80,7 +68,7 @@ class DashBoard extends Component<Props, State> {
         <Header showCards={true} />
         {/* Page content */}
         <Container className="mt--7" fluid>
-          <Row>
+          {/* <Row>
             <Col className="mb-5 mb-xl-0" xl="8">
               <Card className="bg-gradient-default shadow">
                 <CardHeader className="bg-transparent">
@@ -155,193 +143,13 @@ class DashBoard extends Component<Props, State> {
                 </CardBody>
               </Card>
             </Col>
-          </Row>
+          </Row> */}
           <Row className="mt-5">
-            <Col className="mb-5 mb-xl-0" xl="8">
-              <Card className="shadow">
-                <CardHeader className="border-0">
-                  <Row className="align-items-center">
-                    <div className="col">
-                      <h3 className="mb-0">Page visits</h3>
-                    </div>
-                    <div className="col text-right">
-                      <Button
-                        color="primary"
-                        href="#pablo"
-                        onClick={e => e.preventDefault()}
-                        size="sm"
-                      >
-                        See all
-                      </Button>
-                    </div>
-                  </Row>
-                </CardHeader>
-                <Table className="align-items-center table-flush" responsive>
-                  <thead className="thead-light">
-                    <tr>
-                      <th scope="col">Page name</th>
-                      <th scope="col">Visitors</th>
-                      <th scope="col">Unique users</th>
-                      <th scope="col">Bounce rate</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="row">/argon/</th>
-                      <td>4,569</td>
-                      <td>340</td>
-                      <td>
-                        <i className="fas fa-arrow-up text-success mr-3" />{" "}
-                        46,53%
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">/argon/index.html</th>
-                      <td>3,985</td>
-                      <td>319</td>
-                      <td>
-                        <i className="fas fa-arrow-down text-warning mr-3" />{" "}
-                        46,53%
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">/argon/charts.html</th>
-                      <td>3,513</td>
-                      <td>294</td>
-                      <td>
-                        <i className="fas fa-arrow-down text-warning mr-3" />{" "}
-                        36,49%
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">/argon/tables.html</th>
-                      <td>2,050</td>
-                      <td>147</td>
-                      <td>
-                        <i className="fas fa-arrow-up text-success mr-3" />{" "}
-                        50,87%
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">/argon/profile.html</th>
-                      <td>1,795</td>
-                      <td>190</td>
-                      <td>
-                        <i className="fas fa-arrow-down text-danger mr-3" />{" "}
-                        46,53%
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-              </Card>
+            <Col className="mb-5" xl="12">
+              <ShowActiveAndInactiveStaff approved={true} />
             </Col>
-            <Col xl="4">
-              <Card className="shadow">
-                <CardHeader className="border-0">
-                  <Row className="align-items-center">
-                    <div className="col">
-                      <h3 className="mb-0">Social traffic</h3>
-                    </div>
-                    <div className="col text-right">
-                      <Button
-                        color="primary"
-                        href="#pablo"
-                        onClick={e => e.preventDefault()}
-                        size="sm"
-                      >
-                        See all
-                      </Button>
-                    </div>
-                  </Row>
-                </CardHeader>
-                <Table className="align-items-center table-flush" responsive>
-                  <thead className="thead-light">
-                    <tr>
-                      <th scope="col">Referral</th>
-                      <th scope="col">Visitors</th>
-                      <th scope="col" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="row">Facebook</th>
-                      <td>1,480</td>
-                      <td>
-                        <div className="d-flex align-items-center">
-                          <span className="mr-2">60%</span>
-                          <div>
-                            <Progress
-                              max="100"
-                              value="60"
-                              barClassName="bg-gradient-danger"
-                            />
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Facebook</th>
-                      <td>5,480</td>
-                      <td>
-                        <div className="d-flex align-items-center">
-                          <span className="mr-2">70%</span>
-                          <div>
-                            <Progress
-                              max="100"
-                              value="70"
-                              barClassName="bg-gradient-success"
-                            />
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Google</th>
-                      <td>4,807</td>
-                      <td>
-                        <div className="d-flex align-items-center">
-                          <span className="mr-2">80%</span>
-                          <div>
-                            <Progress max="100" value="80" />
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Instagram</th>
-                      <td>3,678</td>
-                      <td>
-                        <div className="d-flex align-items-center">
-                          <span className="mr-2">75%</span>
-                          <div>
-                            <Progress
-                              max="100"
-                              value="75"
-                              barClassName="bg-gradient-info"
-                            />
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">twitter</th>
-                      <td>2,645</td>
-                      <td>
-                        <div className="d-flex align-items-center">
-                          <span className="mr-2">30%</span>
-                          <div>
-                            <Progress
-                              max="100"
-                              value="30"
-                              barClassName="bg-gradient-warning"
-                            />
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-              </Card>
+            <Col xl="12">
+              <ShowActiveAndInactiveStaff approved={false} />
             </Col>
           </Row>
         </Container>
@@ -351,3 +159,69 @@ class DashBoard extends Component<Props, State> {
 }
 
 export default withAuth(DashBoard);
+
+const ShowActiveAndInactiveStaff: React.SFC<{ approved: boolean }> = ({
+  approved
+}) => (
+  <GetAllUserByFilterComponent
+    variables={{
+      data: {
+        roleType: "Staff",
+        approved
+      }
+    }}
+    fetchPolicy="cache-and-network"
+  >
+    {({ data, loading }) => {
+      return (
+        <Card className="shadow">
+          <CardHeader className="border-0">
+            <Row className="align-items-center">
+              <div className="col">
+                <h3 className="mb-0">
+                  {approved ? "Active" : "Inactive"} Staffs
+                </h3>
+              </div>
+              {!loading ? (
+                <div className="col text-right">
+                  <Link href={approved ? "/active-staffs" : "/inactive-staffs"}>
+                    <Button color="primary" size="sm">
+                      See all
+                    </Button>
+                  </Link>
+                </div>
+              ) : null}
+            </Row>
+          </CardHeader>
+          <RotaTable headings={["name", "email", "role"]}>
+            {loading ? (
+              <tr>
+                <td colSpan={4}>
+                  <Loader />
+                </td>
+              </tr>
+            ) : data &&
+              data.getAllUserByFilter &&
+              data.getAllUserByFilter.length > 0 ? (
+              data.getAllUserByFilter
+                .slice(0, 5)
+                .map(({ id, name, email, role }) => (
+                  <tr key={id}>
+                    <RotaTableItemsTitle title={name} />
+                    <RotaTableItemsSimple text={email} />
+                    <RotaTableItemsSimple text={role ? role.title : "N/A"} />
+                  </tr>
+                ))
+            ) : (
+              <tr>
+                <RotaTableItemsSimple
+                  text={`No ${approved ? "Active" : "Inactive"} Staff`}
+                />
+              </tr>
+            )}
+          </RotaTable>
+        </Card>
+      );
+    }}
+  </GetAllUserByFilterComponent>
+);

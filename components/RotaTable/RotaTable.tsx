@@ -10,9 +10,9 @@ import RotaTableHeadItems from "./RotaTableHeadItems";
 
 interface Props {
   headings: string[];
-  pageNumbers: number[];
-  currentPage: number;
-  onPageChange: (currentPage: number) => void;
+  pageNumbers?: number[];
+  currentPage?: number;
+  onPageChange?: (currentPage: number) => void;
 }
 
 export default class RotaTable extends React.Component<Props> {

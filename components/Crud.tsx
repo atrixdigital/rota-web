@@ -80,7 +80,7 @@ class Crud<T extends {}, I extends {}> extends Component<
 
   _onSearch = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { items } = this.props;
-    const { searchField, currentPage } = this.state;
+    const { searchField } = this.state;
     if (searchField) {
       let updatedList = items;
       updatedList = updatedList.filter(item => {
@@ -156,7 +156,7 @@ class Crud<T extends {}, I extends {}> extends Component<
                   <Row className="align-items-center">
                     <div className={`col-${this._generateCols()}`}>
                       <Row className="align-items-center">
-                        <div className="col-3">
+                        <div className="col-md-3">
                           <h3 className="mb-0">{pageTitle}</h3>
                         </div>
                         <div className="col-2">

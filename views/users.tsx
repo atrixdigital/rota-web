@@ -267,7 +267,7 @@ class UserTableRow extends Component<UserTableRowProps, UserTableRowState> {
     });
   }
 
-  _handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+  _handleSwitchChange = (__: React.ChangeEvent<HTMLInputElement>): void => {
     const { refetch } = this.props;
     this.setState({ isActive: !this.state.isActive }, () =>
       refetch(this.state.isActive)
