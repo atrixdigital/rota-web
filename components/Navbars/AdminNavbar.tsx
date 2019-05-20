@@ -13,6 +13,7 @@ import {
   UncontrolledDropdown
 } from "reactstrap";
 import { LogoutComponent, MeMe } from "../../generated/apolloComponent";
+import FlashMessage from "../../lib/FlashMessage";
 
 interface Props {
   brandText: string;
@@ -75,25 +76,6 @@ class AdminNavbar extends React.Component<Props> {
                       <span>My profile</span>
                     </DropdownItem>
                   </Link>
-                  {/* <Link href="/admin/user-profile">
-                    <DropdownItem>
-                      <i className="ni ni-settings-gear-65" />
-                      <span>Settings</span>
-                    </DropdownItem>
-                  </Link>
-                  <Link href="/admin/user-profile">
-                    <DropdownItem>
-                      <i className="ni ni-calendar-grid-58" />
-                      <span>Activity</span>
-                    </DropdownItem>
-                  </Link>
-                  <Link href="/admin/user-profile">
-                    <DropdownItem>
-                      <i className="ni ni-support-16" />
-                      <span>Support</span>
-                    </DropdownItem> 
-    </Link> */}
-
                   <DropdownItem divider />
                   <LogoutComponent>
                     {mutate => (
@@ -102,6 +84,11 @@ class AdminNavbar extends React.Component<Props> {
                         onClick={async e => {
                           e.preventDefault();
                           await mutate();
+                          const flashMessage = new FlashMessage(
+                            "Successfully Logout.",
+                            "success"
+                          );
+                          flashMessage.show();
                           Router.push("/auth/login");
                         }}
                       >

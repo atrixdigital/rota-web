@@ -5,7 +5,11 @@ export const getAllDepartment = gql`
   query GetAllDepartment {
     getAllDepartment {
       ...DepartmentBasicFragment
-      user {
+      manager {
+        id
+        name
+      }
+      staffs {
         id
         name
       }

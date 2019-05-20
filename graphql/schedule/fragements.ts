@@ -7,7 +7,8 @@ export const ScheduleBasicFragment = gql`
     startTime
     endTime
     totalHours
-    user {
+    joinTime
+    staff {
       ...UserBasicFragment
     }
   }

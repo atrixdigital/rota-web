@@ -10,6 +10,9 @@ import "../static/assets/css/argon-dashboard-react.css";
 import "../static/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css";
 import "../static/assets/vendor/nucleo/css/nucleo.css";
 
+import "noty/lib/noty.css";
+import "noty/lib/themes/metroui.css";
+
 import "../static/assets/css/style.css";
 
 interface State {

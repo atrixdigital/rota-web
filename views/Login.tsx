@@ -1,25 +1,24 @@
+import { Field, Form, Formik } from "formik";
+import Link from "next/link";
+import Router from "next/router";
 import React from "react";
-
-
 // reactstrap components
 import {
   Button,
   Card,
   CardBody,
+  Col,
   FormGroup,
+  InputGroup,
   InputGroupAddon,
   InputGroupText,
-  InputGroup,
-  Row,
-  Col
+  Row
 } from "reactstrap";
+import InputField from "../components/input-field";
 import Layout from "../components/Layout";
 import { LoginComponent } from "../generated/apolloComponent";
-import { Formik, Form, Field } from "formik";
+import FlashMessage from "../lib/FlashMessage";
 import { validateLoginSchema } from "../shared/validation-schema";
-import InputField from "../components/input-field";
-import Router from "next/router";
-import Link from "next/link";
 
 interface FormValues {
   email: string;
@@ -28,6 +27,7 @@ interface FormValues {
 
 class Login extends React.Component {
   render() {
+    const flassMessage = new FlashMessage();
     return (
       <Layout bodyClass="bg-default">
         <Col lg="5" md="7">
@@ -38,17 +38,25 @@ class Login extends React.Component {
                   email: "",
                   password: ""
                 }}
-                onSubmit={async (values, { setErrors }) => {
-                  const response = await mutate({
-                    variables: values
-                  });
-                  if (response && response.data && !response.data.login) {
-                    setErrors({
-                      email: "invalid login"
+                onSubmit={async (values, { setErrors, setSubmitting }) => {
+                  try {
+                    const response = await mutate({
+                      variables: values
                     });
-                    return;
+                    if (response && response.data && !response.data.login) {
+                      setErrors({
+                        email: "invalid login"
+                      });
+                      return;
+                    }
+                    flassMessage.text = "Successfully Loggedin.";
+                    flassMessage.type = "success";
+                    flassMessage.show();
+                    Router.push("/dashboard");
+                  } catch (e) {
+                    // console.log(e.message);
                   }
-                  Router.push("/dashboard");
+                  setSubmitting(false);
                 }}
                 validationSchema={validateLoginSchema}
                 render={({ isSubmitting }) => (

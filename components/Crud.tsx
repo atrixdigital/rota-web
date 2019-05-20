@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   CardHeader,
-  Container,
   FormGroup,
   Input,
   InputGroup,
@@ -16,11 +15,18 @@ import {
   ModalHeader,
   Row
 } from "reactstrap";
-import { MeMe } from "../generated/apolloComponent";
-import AdminLayout from "./AdminLayout";
-import Header from "./Headers/Header";
+import {
+  GetAllAreaComponent,
+  GetAllRoleNoAuthComponent,
+  MeMe
+} from "../generated/apolloComponent";
 import Loader from "./Loader";
 import RotaTable from "./RotaTable/RotaTable";
+
+interface FiltersClause {
+  isAreaFilter?: boolean;
+  isTypeFilter?: boolean;
+}
 
 interface Props<T, I> {
   pageTitle: string;
@@ -36,8 +42,10 @@ interface Props<T, I> {
   getActionType: () => string;
   generateFormFields: () => JSX.Element;
   isModalOpen: boolean;
-  filters?: string[];
   me?: MeMe;
+  isCreate?: boolean;
+  isFilters?: boolean;
+  filters?: FiltersClause;
 }
 
 interface State<T> {
@@ -45,6 +53,8 @@ interface State<T> {
   currentPage: number;
   totalPerPage: number;
   searchField: string;
+  areaFieldValue: string;
+  typeFieldValue: string;
 }
 
 class Crud<T extends {}, I extends {}> extends Component<
@@ -55,7 +65,9 @@ class Crud<T extends {}, I extends {}> extends Component<
     items: this.props.items,
     currentPage: 1,
     totalPerPage: 10,
-    searchField: this.props.fields.length > 0 ? this.props.fields[0] : ""
+    searchField: this.props.fields.length > 0 ? this.props.fields[0] : "",
+    areaFieldValue: "",
+    typeFieldValue: ""
   };
 
   componentWillReceiveProps(nextProps) {
@@ -64,19 +76,6 @@ class Crud<T extends {}, I extends {}> extends Component<
       searchField: nextProps.fields.length > 0 ? nextProps.fields[0] : ""
     });
   }
-
-  _isSearch = (): boolean => {
-    const { filters } = this.props;
-    return filters ? !!filters.find(filter => filter === "filter") : false;
-  };
-
-  _generateCols = (): number => {
-    let totalCols = 11;
-    if (this._isSearch()) {
-      totalCols = totalCols - 5;
-    }
-    return totalCols;
-  };
 
   _onSearch = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { items } = this.props;
@@ -140,134 +139,246 @@ class Crud<T extends {}, I extends {}> extends Component<
       getActionType,
       generateFormFields,
       isModalOpen,
-      me
+      me,
+      isCreate,
+      isFilters,
+      filters
     } = this.props;
-    const { items, currentPage, searchField, totalPerPage } = this.state;
+    const {
+      items,
+      currentPage,
+      searchField,
+      totalPerPage,
+      areaFieldValue,
+      typeFieldValue
+    } = this.state;
     const { pageNumbers, currentItems } = this._generatePaginationMeta();
 
     return (
-      <AdminLayout pageTitle={pageTitle} me={me}>
-        <Header />
-        <Container className="mt--7" fluid>
-          <Row>
-            <div className="col">
-              <Card className="shadow">
-                <CardHeader className="border-0">
-                  <Row className="align-items-center">
-                    <div className={`col-${this._generateCols()}`}>
-                      <Row className="align-items-center">
-                        <div className="col-md-3">
-                          <h3 className="mb-0">{pageTitle}</h3>
-                        </div>
-                        <div className="col-2">
-                          <div className="navbar-search form-inline d-none d-md-flex ml-lg-auto">
-                            <FormGroup className="mb-0">
-                              <InputGroup className="input-group-alternative">
-                                <Input
-                                  placeholder="No. of Pages"
-                                  type="select"
-                                  value={totalPerPage}
-                                  onChange={e => {
-                                    this.setState({
-                                      totalPerPage: parseInt(e.target.value)
-                                    });
-                                  }}
-                                >
-                                  <option value={10}>10</option>
-                                  <option value={20}>20</option>
-                                  <option value={50}>50</option>
-                                  <option value={100}>100</option>
-                                  <option value={500}>500</option>
-                                </Input>
-                              </InputGroup>
-                            </FormGroup>
-                          </div>
-                        </div>
-                      </Row>
-                    </div>
-                    {this._isSearch() && searchField ? (
-                      <>
-                        <div className="col-3 text-right">
-                          <div className="navbar-search form-inline d-none d-md-flex ml-lg-auto">
-                            <FormGroup className="mb-0">
-                              <InputGroup className="input-group-alternative">
-                                <InputGroupAddon addonType="prepend">
-                                  <InputGroupText>
-                                    <i className="fas fa-search" />
-                                  </InputGroupText>
-                                </InputGroupAddon>
-                                <Input
-                                  placeholder="Search"
-                                  type="text"
-                                  onChange={this._onSearch}
-                                />
-                              </InputGroup>
-                            </FormGroup>
-                          </div>
-                        </div>
-                        {fields && fields.length > 0 ? (
-                          <div className="col-2">
-                            <div className="navbar-search form-inline d-none d-md-flex ml-lg-auto">
+      <>
+        <Card className="shadow">
+          <CardHeader className="border-0">
+            <h3 className="mb-3">{pageTitle}</h3>
+            <Row className="align-items-center">
+              {isFilters && filters ? (
+                <>
+                  {filters.isAreaFilter ? (
+                    <div className="col-md-2 col-sm-6">
+                      <GetAllAreaComponent>
+                        {({ data, loading }) => {
+                          if (loading) {
+                            return <Loader />;
+                          }
+                          return (
+                            <div className="navbar-search form-inline d-flex ml-lg-auto">
                               <FormGroup className="mb-0">
                                 <InputGroup className="input-group-alternative">
                                   <Input
-                                    placeholder="Search Field"
+                                    placeholder="Select Area"
                                     type="select"
-                                    value={searchField}
+                                    value={areaFieldValue}
                                     onChange={e => {
                                       this.setState({
-                                        searchField: e.target.value
+                                        areaFieldValue: e.target.value
                                       });
                                     }}
                                   >
-                                    <option>Search Field</option>
-                                    {fields.map((f, i) =>
-                                      f ? (
-                                        <option key={i} value={f}>
-                                          {f}
-                                        </option>
-                                      ) : null
-                                    )}
+                                    <option value="">Select Area</option>
+                                    {data &&
+                                      data.getAllArea &&
+                                      data.getAllArea.length > 0 &&
+                                      data.getAllArea.map(({ id, title }) => {
+                                        return (
+                                          <option key={id} value={id}>
+                                            {title}
+                                          </option>
+                                        );
+                                      })}
                                   </Input>
                                 </InputGroup>
                               </FormGroup>
                             </div>
-                          </div>
-                        ) : null}
-                      </>
-                    ) : null}
-                    <div className="col text-right">
-                      <Button
-                        color="primary"
-                        onClick={async () => {
-                          await changeActionType();
-                          toggleModal();
+                          );
                         }}
-                        size="sm"
-                      >
-                        Create
-                      </Button>
+                      </GetAllAreaComponent>
                     </div>
-                  </Row>
-                </CardHeader>
-                {/* render data and table */}
-                {loading && <Loader className="col-12" />}
-                {items && items.length > 0 ? (
-                  <RotaTable
-                    headings={fields}
-                    pageNumbers={pageNumbers}
-                    currentPage={currentPage}
-                    onPageChange={this._onPageChange}
+                  ) : null}
+                  {filters.isTypeFilter && (
+                    <div className="col-md-2 col-sm-6">
+                      <GetAllRoleNoAuthComponent>
+                        {({ data, loading }) => {
+                          if (loading) {
+                            return <Loader />;
+                          }
+                          return (
+                            <div className="navbar-search form-inline d-flex ml-lg-auto">
+                              <FormGroup className="mb-0">
+                                <InputGroup className="input-group-alternative">
+                                  <Input
+                                    placeholder="Select Type"
+                                    type="select"
+                                    value={typeFieldValue}
+                                    onChange={e => {
+                                      this.setState({
+                                        typeFieldValue: e.target.value
+                                      });
+                                    }}
+                                  >
+                                    <option value="">Select Type</option>
+                                    {data &&
+                                      data.getAllRoleNoAuth &&
+                                      data.getAllRoleNoAuth.length > 0 &&
+                                      data.getAllRoleNoAuth
+                                        .filter(
+                                          ({ title }) => title !== "Manager"
+                                        )
+                                        .map(({ id, title }) => {
+                                          return (
+                                            <option key={id} value={id}>
+                                              {title}
+                                            </option>
+                                          );
+                                        })}
+                                  </Input>
+                                </InputGroup>
+                              </FormGroup>
+                            </div>
+                          );
+                        }}
+                      </GetAllRoleNoAuthComponent>
+                    </div>
+                  )}
+                  <div className="col-md-3 col-sm-8">
+                    <div className="navbar-search form-inline d-flex ml-lg-auto">
+                      <FormGroup className="mb-0">
+                        <InputGroup className="input-group-alternative">
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="fas fa-search" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            placeholder="Search"
+                            type="text"
+                            onChange={this._onSearch}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </div>
+                  </div>
+                  {fields && fields.length > 0 ? (
+                    <div className="col-md-2 col-sm-2">
+                      <div className="navbar-search form-inline d-flex ml-lg-auto">
+                        <FormGroup className="mb-0">
+                          <InputGroup className="input-group-alternative">
+                            <Input
+                              placeholder="Search Field"
+                              type="select"
+                              value={searchField}
+                              onChange={e => {
+                                this.setState({
+                                  searchField: e.target.value
+                                });
+                              }}
+                            >
+                              <option>Search Field</option>
+                              {fields.map((f, i) =>
+                                f ? (
+                                  <option key={i} value={f}>
+                                    {f}
+                                  </option>
+                                ) : null
+                              )}
+                            </Input>
+                          </InputGroup>
+                        </FormGroup>
+                      </div>
+                    </div>
+                  ) : null}
+                </>
+              ) : null}
+              {isFilters && (
+                <div className="col-md-2 col-sm-3">
+                  <div className="navbar-search form-inline d-flex ml-lg-auto">
+                    <FormGroup className="mb-0">
+                      <InputGroup className="input-group-alternative">
+                        <Input
+                          placeholder="No. of Pages"
+                          type="select"
+                          value={totalPerPage}
+                          onChange={e => {
+                            this.setState({
+                              totalPerPage: parseInt(e.target.value)
+                            });
+                          }}
+                        >
+                          <option value={10}>10</option>
+                          <option value={20}>20</option>
+                          <option value={50}>50</option>
+                          <option value={100}>100</option>
+                          <option value={500}>500</option>
+                        </Input>
+                      </InputGroup>
+                    </FormGroup>
+                  </div>
+                </div>
+              )}
+              {isCreate && (
+                <div className="col text-right">
+                  <Button
+                    color="primary"
+                    onClick={async () => {
+                      await changeActionType();
+                      toggleModal();
+                    }}
+                    size="sm"
                   >
-                    {currentItems.map(item => renderItem(item))}
-                  </RotaTable>
-                ) : (
-                  <div />
-                )}
-              </Card>
-            </div>
-          </Row>
-        </Container>
+                    Create
+                  </Button>
+                </div>
+              )}
+            </Row>
+          </CardHeader>
+          {/* render data and table */}
+          {loading && <Loader className="col-12" />}
+          {items && items.length > 0 ? (
+            <RotaTable
+              headings={fields}
+              pageNumbers={pageNumbers}
+              currentPage={currentPage}
+              onPageChange={this._onPageChange}
+            >
+              {currentItems
+                .filter(item => {
+                  if (
+                    filters &&
+                    filters.isAreaFilter &&
+                    areaFieldValue !== ""
+                  ) {
+                    return item["area"]
+                      ? item["area"].id === areaFieldValue
+                      : true;
+                  }
+                  return true;
+                })
+                .filter(item => {
+                  if (
+                    filters &&
+                    filters.isTypeFilter &&
+                    typeFieldValue !== ""
+                  ) {
+                    return item["role"]
+                      ? item["role"].id === typeFieldValue
+                      : true;
+                  }
+                  return true;
+                })
+                .map(item => renderItem(item))}
+            </RotaTable>
+          ) : (
+            <div />
+          )}
+        </Card>
         <Modal isOpen={isModalOpen} toggle={toggleModal} size="lg">
           <Formik<I>
             initialValues={initialValue}
@@ -301,7 +412,7 @@ class Crud<T extends {}, I extends {}> extends Component<
             }}
           />
         </Modal>
-      </AdminLayout>
+      </>
     );
   }
 }

@@ -3,12 +3,13 @@ import {
   InMemoryCache,
   NormalizedCacheObject
 } from "apollo-boost";
-import fetch from "isomorphic-unfetch";
 import { setContext } from "apollo-link-context";
-import { isBrowser } from "./isBrowser";
-import { createHttpLink } from "apollo-link-http";
 import { onError } from "apollo-link-error";
+import { createHttpLink } from "apollo-link-http";
+import fetch from "isomorphic-unfetch";
 import Router from "next/router";
+import FlashMessage from "./FlashMessage";
+import { isBrowser } from "./isBrowser";
 
 let apolloClient: ApolloClient<NormalizedCacheObject> | null = null;
 
@@ -37,6 +38,10 @@ function create(initialState: any, { getToken }: Options) {
 
         if (isBrowser && message.includes("not authenticated")) {
           Router.replace("/auth/login");
+        }
+        if (isBrowser) {
+          const flassMessage = new FlashMessage(message);
+          flassMessage.show();
         }
       });
     if (networkError) console.log(`[Network error]: ${networkError}`);

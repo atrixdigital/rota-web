@@ -1,17 +1,12 @@
 import { Component } from "react";
 import { compose } from "react-apollo";
-import Toggle from "react-toggle";
 import Crud from "../components/Crud";
 import {
   PasswordField,
   SelectField,
   TextField
 } from "../components/FormFields";
-import {
-  RotaTableItemsActions,
-  RotaTableItemsSimple,
-  RotaTableItemsTitle
-} from "../components/RotaTable/RotaTableItems";
+import UserTableRow from "../components/UserTableRow";
 import {
   ApprovedUserHOC,
   ApprovedUserMutationFn,
@@ -19,6 +14,8 @@ import {
   CreateUserMutationFn,
   DeleteByUserIdHOC,
   DeleteByUserIdMutationFn,
+  GetAllAreaHOC,
+  GetAllAreaQuery,
   GetAllRoleNoAuthHOC,
   GetAllRoleNoAuthQuery,
   GetAllUserByFilterComponent,
@@ -37,9 +34,18 @@ interface Props
     CreateUserMutationFn
   > {
   getAllRoleNoAuth: GetAllRoleNoAuthQuery;
+  getAllArea: GetAllAreaQuery;
   approvedUser: ApprovedUserMutationFn;
   variables?: GetAllUserByFilterVariables;
   pageTitle: string;
+  fields?: string[];
+  isCreate?: boolean;
+  isFilters?: boolean;
+  filters?: any;
+  isUpdate?: boolean;
+  isDelete?: boolean;
+  isApprove?: boolean;
+  isDecline?: boolean;
 }
 
 interface State {
@@ -54,8 +60,9 @@ interface InitialValue {
   lastName: string;
   email: string;
   password: string;
-  appproved?: string;
+  phone: string;
   roleID: string;
+  areaID?: string;
 }
 
 class Users extends Component<Props, State> {
@@ -67,7 +74,9 @@ class Users extends Component<Props, State> {
       lastName: "",
       email: "",
       password: "",
-      roleID: ""
+      phone: "",
+      roleID: "",
+      areaID: ""
     },
     selectedID: ""
   };
@@ -87,13 +96,22 @@ class Users extends Component<Props, State> {
   render() {
     const {
       getAllRoleNoAuth: { getAllRoleNoAuth },
+      getAllArea: { getAllArea },
       create,
       updateBy,
       deleteBy,
       approvedUser,
       me,
       variables,
-      pageTitle
+      pageTitle,
+      fields,
+      isCreate,
+      isFilters,
+      filters,
+      isUpdate,
+      isDelete,
+      isApprove,
+      isDecline
     } = this.props;
     const { initialValue, actionType, selectedID, modal } = this.state;
     return (
@@ -105,13 +123,19 @@ class Users extends Component<Props, State> {
           return (
             <>
               <Crud<GetAllUserGetAllUser, InitialValue>
-                filters={["filter"]}
+                isFilters={isFilters}
+                isCreate={isCreate}
+                filters={filters}
                 me={me}
                 toggleModal={this._toggleModal}
                 isModalOpen={modal}
                 pageTitle={pageTitle}
                 items={data.getAllUserByFilter}
-                fields={["name", "email", "role", "status", ""]}
+                fields={
+                  fields && fields.length > 0
+                    ? fields
+                    : ["name", "area", "designation", "phone", "email", ""]
+                }
                 loading={loading}
                 changeActionType={this._changeActionType}
                 getActionType={this._getActionType}
@@ -119,7 +143,67 @@ class Users extends Component<Props, State> {
                   return (
                     <UserTableRow
                       key={item.id}
+                      isUpdate={isUpdate}
+                      isDelete={isDelete}
+                      isApprove={isApprove}
+                      isDecline={isDecline}
                       item={item}
+                      onApprove={async () => {
+                        const {
+                          id,
+                          firstName,
+                          lastName,
+                          email,
+                          password,
+                          phone,
+                          role,
+                          area
+                        } = item;
+                        await updateBy({
+                          variables: {
+                            id,
+                            data: {
+                              firstName,
+                              lastName,
+                              email,
+                              password,
+                              phone,
+                              appproved: true,
+                              roleID: this._getOptionalObjectID(role),
+                              areaID: this._getOptionalObjectID(area)
+                            }
+                          }
+                        });
+                        refetch();
+                      }}
+                      onDecline={async () => {
+                        const {
+                          id,
+                          firstName,
+                          lastName,
+                          email,
+                          password,
+                          phone,
+                          role,
+                          area
+                        } = item;
+                        await updateBy({
+                          variables: {
+                            id,
+                            data: {
+                              firstName,
+                              lastName,
+                              email,
+                              password,
+                              phone,
+                              appproved: false,
+                              roleID: this._getOptionalObjectID(role),
+                              areaID: this._getOptionalObjectID(area)
+                            }
+                          }
+                        });
+                        refetch();
+                      }}
                       onDelete={async () => {
                         await deleteBy({
                           variables: {
@@ -135,7 +219,9 @@ class Users extends Component<Props, State> {
                           lastName,
                           email,
                           password,
-                          role
+                          phone,
+                          role,
+                          area
                         } = item;
                         await this._changeActionType("update");
                         this.setState(
@@ -146,7 +232,9 @@ class Users extends Component<Props, State> {
                               lastName,
                               email,
                               password,
-                              roleID: this._getOptionalObjectID(role)
+                              phone,
+                              roleID: this._getOptionalObjectID(role),
+                              areaID: this._getOptionalObjectID(area)
                             }
                           },
                           () => this._toggleModal()
@@ -206,6 +294,12 @@ class Users extends Component<Props, State> {
                         placeholder="Email"
                         componentType="email"
                       />
+                      <TextField
+                        label="Phone"
+                        name="phone"
+                        placeholder="Phone"
+                        componentType="text"
+                      />
                       <PasswordField
                         label="Password"
                         name="password"
@@ -218,7 +312,22 @@ class Users extends Component<Props, State> {
                         componentType="select"
                         options={
                           getAllRoleNoAuth.length > 0
-                            ? getAllRoleNoAuth.map(({ id, title }) => ({
+                            ? getAllRoleNoAuth
+                                .filter(({ title }) => title !== "Manager")
+                                .map(({ id, title }) => ({
+                                  id,
+                                  title
+                                }))
+                            : []
+                        }
+                      />
+                      <SelectField
+                        label="Area"
+                        name="areaID"
+                        componentType="select"
+                        options={
+                          getAllArea.length > 0
+                            ? getAllArea.map(({ id, title }) => ({
                                 id,
                                 title
                               }))
@@ -239,61 +348,9 @@ class Users extends Component<Props, State> {
 
 export default compose(
   GetAllRoleNoAuthHOC({ name: "getAllRoleNoAuth" }),
+  GetAllAreaHOC({ name: "getAllArea" }),
   DeleteByUserIdHOC({ name: "deleteBy" }),
   UpdateByUserIdHOC({ name: "updateBy" }),
   CreateUserHOC({ name: "create" }),
   ApprovedUserHOC({ name: "approvedUser" })
 )(Users);
-
-interface UserTableRowState {
-  isActive: boolean;
-}
-
-interface UserTableRowProps {
-  item: GetAllUserGetAllUser;
-  onDelete: () => void;
-  onUpdate: () => void;
-  refetch: (approved: boolean) => void;
-}
-
-class UserTableRow extends Component<UserTableRowProps, UserTableRowState> {
-  state: Readonly<UserTableRowState> = {
-    isActive: this.props.item.appproved
-  };
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      isActive: nextProps.item.appproved
-    });
-  }
-
-  _handleSwitchChange = (__: React.ChangeEvent<HTMLInputElement>): void => {
-    const { refetch } = this.props;
-    this.setState({ isActive: !this.state.isActive }, () =>
-      refetch(this.state.isActive)
-    );
-  };
-
-  render() {
-    const {
-      item: { id, name, email, role },
-      onDelete,
-      onUpdate
-    } = this.props;
-    const { isActive } = this.state;
-    return (
-      <tr key={id}>
-        <RotaTableItemsTitle title={name} />
-        <RotaTableItemsSimple text={email} />
-        <RotaTableItemsSimple text={role ? role.title : "No Role"} />
-        <td>
-          <Toggle
-            defaultChecked={isActive}
-            onChange={this._handleSwitchChange}
-          />
-        </td>
-        <RotaTableItemsActions onDelete={onDelete} onUpdate={onUpdate} />
-      </tr>
-    );
-  }
-}

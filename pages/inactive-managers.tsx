@@ -4,7 +4,7 @@ import {
   UserBasicFragmentFragment
 } from "../generated/apolloComponent";
 import { withAuth } from "../lib/withAuth";
-import Users from "../views/users";
+import Users from "../views/Users";
 
 interface Props {
   me: UserBasicFragmentFragment;

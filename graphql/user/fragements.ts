@@ -8,6 +8,11 @@ export const UserBasicFragment = gql`
     name
     email
     password
+    phone
     appproved
+    area {
+      id
+      title
+    }
   }
 `;

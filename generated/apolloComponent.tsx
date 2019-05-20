@@ -19,9 +19,15 @@ export interface CreateUserInput {
 
   password: string;
 
-  approved?: Maybe<boolean>;
+  phone: string;
+
+  appproved?: Maybe<boolean>;
 
   roleID: string;
+
+  departmentID?: Maybe<string>;
+
+  areaID?: Maybe<string>;
 }
 
 export interface UpdateUserInput {
@@ -33,9 +39,15 @@ export interface UpdateUserInput {
 
   password: string;
 
-  approved?: Maybe<boolean>;
+  phone: string;
+
+  appproved?: Maybe<boolean>;
 
   roleID: string;
+
+  departmentID?: Maybe<string>;
+
+  areaID?: Maybe<string>;
 }
 
 export interface CreateScheduleInput {
@@ -45,7 +57,9 @@ export interface CreateScheduleInput {
 
   totalHours: number;
 
-  userID: string;
+  joinTime?: Maybe<string>;
+
+  staffID: string;
 }
 
 export interface UpdateScheduleInput {
@@ -55,7 +69,9 @@ export interface UpdateScheduleInput {
 
   totalHours: number;
 
-  userID: string;
+  joinTime?: Maybe<string>;
+
+  staffID: string;
 }
 
 export interface CreateRoleInput {
@@ -66,6 +82,18 @@ export interface UpdateRoleInput {
   title: string;
 }
 
+export interface CreateHospitalInput {
+  title: string;
+
+  adminID: string;
+}
+
+export interface UpdateHospitalInput {
+  title: string;
+
+  adminID: string;
+}
+
 export interface CreateDepartmentInput {
   title: string;
 
@@ -73,7 +101,7 @@ export interface CreateDepartmentInput {
 
   phone: string;
 
-  userID: string;
+  hospitalID: string;
 }
 
 export interface UpdateDepartmentInput {
@@ -83,7 +111,19 @@ export interface UpdateDepartmentInput {
 
   phone: string;
 
-  userID: string;
+  hospitalID: string;
+}
+
+export interface CreateAreaInput {
+  title: string;
+
+  departmentID: string;
+}
+
+export interface UpdateAreaInput {
+  title: string;
+
+  departmentID: string;
 }
 
 export interface ChangePasswordInput {
@@ -95,6 +135,16 @@ export interface ChangePasswordInput {
 // ====================================================
 // Documents
 // ====================================================
+
+export type GetAllAreaVariables = {};
+
+export type GetAllAreaQuery = {
+  __typename?: "Query";
+
+  getAllArea: GetAllAreaGetAllArea[];
+};
+
+export type GetAllAreaGetAllArea = AreaBasicFragmentFragment;
 
 export type CreateDepartmentVariables = {
   data: CreateDepartmentInput;
@@ -142,10 +192,20 @@ export type GetAllDepartmentQuery = {
 export type GetAllDepartmentGetAllDepartment = {
   __typename?: "Department";
 
-  user: Maybe<GetAllDepartmentUser>;
+  manager: GetAllDepartmentManager;
+
+  staffs: GetAllDepartmentStaffs[];
 } & DepartmentBasicFragmentFragment;
 
-export type GetAllDepartmentUser = {
+export type GetAllDepartmentManager = {
+  __typename?: "User";
+
+  id: string;
+
+  name: string;
+};
+
+export type GetAllDepartmentStaffs = {
   __typename?: "User";
 
   id: string;
@@ -432,6 +492,14 @@ export type MeMe = {
 
 export type MeRole = RoleBasicFragmentFragment;
 
+export type AreaBasicFragmentFragment = {
+  __typename?: "Area";
+
+  id: string;
+
+  title: string;
+};
+
 export type DepartmentBasicFragmentFragment = {
   __typename?: "Department";
 
@@ -463,10 +531,12 @@ export type ScheduleBasicFragmentFragment = {
 
   totalHours: number;
 
-  user: Maybe<ScheduleBasicFragmentUser>;
+  joinTime: Maybe<string>;
+
+  staff: Maybe<ScheduleBasicFragmentStaff>;
 };
 
-export type ScheduleBasicFragmentUser = UserBasicFragmentFragment;
+export type ScheduleBasicFragmentStaff = UserBasicFragmentFragment;
 
 export type UserBasicFragmentFragment = {
   __typename?: "User";
@@ -483,7 +553,19 @@ export type UserBasicFragmentFragment = {
 
   password: string;
 
+  phone: string;
+
   appproved: Maybe<boolean>;
+
+  area: Maybe<UserBasicFragmentArea>;
+};
+
+export type UserBasicFragmentArea = {
+  __typename?: "Area";
+
+  id: string;
+
+  title: string;
 };
 
 import * as ReactApollo from "react-apollo";
@@ -494,6 +576,13 @@ import gql from "graphql-tag";
 // ====================================================
 // Fragments
 // ====================================================
+
+export const AreaBasicFragmentFragmentDoc = gql`
+  fragment AreaBasicFragment on Area {
+    id
+    title
+  }
+`;
 
 export const DepartmentBasicFragmentFragmentDoc = gql`
   fragment DepartmentBasicFragment on Department {
@@ -519,7 +608,12 @@ export const UserBasicFragmentFragmentDoc = gql`
     name
     email
     password
+    phone
     appproved
+    area {
+      id
+      title
+    }
   }
 `;
 
@@ -529,7 +623,8 @@ export const ScheduleBasicFragmentFragmentDoc = gql`
     startTime
     endTime
     totalHours
-    user {
+    joinTime
+    staff {
       ...UserBasicFragment
     }
   }
@@ -541,6 +636,48 @@ export const ScheduleBasicFragmentFragmentDoc = gql`
 // Components
 // ====================================================
 
+export const GetAllAreaDocument = gql`
+  query GetAllArea {
+    getAllArea {
+      ...AreaBasicFragment
+    }
+  }
+
+  ${AreaBasicFragmentFragmentDoc}
+`;
+export class GetAllAreaComponent extends React.Component<
+  Partial<ReactApollo.QueryProps<GetAllAreaQuery, GetAllAreaVariables>>
+> {
+  render() {
+    return (
+      <ReactApollo.Query<GetAllAreaQuery, GetAllAreaVariables>
+        query={GetAllAreaDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type GetAllAreaProps<TChildProps = any> = Partial<
+  ReactApollo.DataProps<GetAllAreaQuery, GetAllAreaVariables>
+> &
+  TChildProps;
+export function GetAllAreaHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        GetAllAreaQuery,
+        GetAllAreaVariables,
+        GetAllAreaProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    GetAllAreaQuery,
+    GetAllAreaVariables,
+    GetAllAreaProps<TChildProps>
+  >(GetAllAreaDocument, operationOptions);
+}
 export const CreateDepartmentDocument = gql`
   mutation CreateDepartment($data: CreateDepartmentInput!) {
     createDepartment(data: $data) {
@@ -706,7 +843,11 @@ export const GetAllDepartmentDocument = gql`
   query GetAllDepartment {
     getAllDepartment {
       ...DepartmentBasicFragment
-      user {
+      manager {
+        id
+        name
+      }
+      staffs {
         id
         name
       }

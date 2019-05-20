@@ -55,3 +55,8 @@ button {
     transform: rotate(360deg);
   }
 }
+
+.nav-link img {
+  width: 25px;
+  margin-right: 8px;
+}

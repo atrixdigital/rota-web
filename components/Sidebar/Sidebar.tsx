@@ -25,7 +25,7 @@ import {
   UncontrolledDropdown
 } from "reactstrap";
 import { LogoutComponent, MeMe } from "../../generated/apolloComponent";
-import { isAdmin } from "../../shared/helpersFunctions";
+import FlashMessage from "../../lib/FlashMessage";
 
 interface State {
   collapseOpen: boolean;
@@ -85,39 +85,15 @@ class Sidebar extends React.Component<Props, State> {
                 style={{ color: "#000", fontSize: "25px" }}
               >
                 ROTA
-                {/* <img
-                alt={logo.imgAlt}
-                className="navbar-brand-img"
-                src={logo.imgSrc}
-              /> */}
               </NavbarBrand>
             </Link>
           ) : null}
           <Nav className="align-items-center d-md-none">
-            {/* <UncontrolledDropdown nav>
-              <DropdownToggle nav className="nav-link-icon">
-                <i className="ni ni-bell-55" />
-              </DropdownToggle>
-              <DropdownMenu
-                aria-labelledby="navbar-default_dropdown_1"
-                className="dropdown-menu-arrow"
-                right
-              >
-                <DropdownItem>Action</DropdownItem>
-                <DropdownItem>Another action</DropdownItem>
-                <DropdownItem divider />
-                <DropdownItem>Something else here</DropdownItem>
-              </DropdownMenu>
-            </UncontrolledDropdown> */}
             <UncontrolledDropdown nav>
               <DropdownToggle nav>
                 <Media className="align-items-center">
                   <span className="avatar avatar-sm rounded-circle">
                     {nameAvatar}
-                    {/* <img
-                      alt="..."
-                      src={require("../../static/assets/img/theme/team-1-800x800.jpg")}
-                    /> */}
                   </span>
                 </Media>
               </DropdownToggle>
@@ -131,35 +107,6 @@ class Sidebar extends React.Component<Props, State> {
                     <span>My profile</span>
                   </DropdownItem>
                 </Link>
-                {/* <Link href="/admin/user-profile">
-                  <DropdownItem>
-                    <i className="ni ni-single-02" />
-                    <span>My profile</span>
-                  </DropdownItem>
-                </Link>
-                <Link href="/admin/user-profile">
-                  <DropdownItem>
-                    <i className="ni ni-settings-gear-65" />
-                    <span>Settings</span>
-                  </DropdownItem>
-                </Link>
-                <Link href="/admin/user-profile">
-                  <DropdownItem>
-                    <i className="ni ni-calendar-grid-58" />
-                    <span>Activity</span>
-                  </DropdownItem>
-                </Link>
-                <Link href="/admin/user-profile">
-                  <DropdownItem>
-                    <i className="ni ni-support-16" />
-                    <span>Support</span>
-                  </DropdownItem>
-                </Link>
-                <DropdownItem divider />
-                <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
-                  <i className="ni ni-user-run" />
-                  <span>Logout</span>
-                </DropdownItem> */}
                 <DropdownItem divider />
                 <LogoutComponent>
                   {mutate => (
@@ -168,6 +115,11 @@ class Sidebar extends React.Component<Props, State> {
                       onClick={async e => {
                         e.preventDefault();
                         await mutate();
+                        const flashMessage = new FlashMessage(
+                          "Successfully Logout.",
+                          "success"
+                        );
+                        flashMessage.show();
                         Router.push("/auth/login");
                       }}
                     >
@@ -229,11 +181,27 @@ class Sidebar extends React.Component<Props, State> {
                     onClick={this.closeCollapse}
                     activeClassName="active"
                   >
+                    <img
+                      src={require("../../static/assets/img/icons/Icons/dash.png")}
+                    />{" "}
                     Dashboard
                   </NavLink>
                 </Link>
               </NavItem>
-              {isAdmin(me) ? (
+              <NavItem>
+                <Link href={`/manage-staff`}>
+                  <NavLink
+                    onClick={this.closeCollapse}
+                    activeClassName="active"
+                  >
+                    <img
+                      src={require("../../static/assets/img/icons/Icons/staff.png")}
+                    />{" "}
+                    Manage Staff
+                  </NavLink>
+                </Link>
+              </NavItem>
+              {/* {isAdmin(me) ? (
                 <>
                   <NavItem>
                     <Link href={`/active-managers`}>
@@ -279,7 +247,7 @@ class Sidebar extends React.Component<Props, State> {
                 <Link href={`/schedules`}>
                   <NavLink onClick={this.closeCollapse}>Schedules</NavLink>
                 </Link>
-              </NavItem>
+              </NavItem> */}
             </Nav>
             {/* <hr className="my-3" />
             <h6 className="navbar-heading text-muted">Documentation</h6>

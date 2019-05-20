@@ -14,6 +14,9 @@ export const withAuth = <T extends object>(C: React.ComponentClass<T>) => {
           me: null
         };
       }
+      // return {
+      //   me: null
+      // };
 
       // console.log({
       //   me: response.data.me,

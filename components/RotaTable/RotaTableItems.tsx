@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem
-} from "reactstrap";
+import { Button } from "reactstrap";
 
 export const RotaTableItemsTitle: React.SFC<{ title: string }> = ({
   title
@@ -22,15 +17,48 @@ interface Props {
   onOpen?: () => void;
   onDelete: () => void;
   onUpdate: () => void;
+  onApprove: () => void;
+  onDecline: () => void;
+  isDelete?: boolean;
+  isUpdate?: boolean;
+  isApprove?: boolean;
+  isDecline?: boolean;
 }
 
 export const RotaTableItemsActions: React.SFC<Props> = ({
   onDelete,
   onUpdate,
-  onOpen
+  onApprove,
+  onDecline,
+  onOpen,
+  isDelete,
+  isUpdate,
+  isApprove,
+  isDecline
 }) => (
   <td className="text-right">
-    <UncontrolledDropdown>
+    {isUpdate && (
+      <Button color="primary" onClick={onUpdate} size="sm">
+        Update
+      </Button>
+    )}
+    {isDelete && (
+      <Button color="primary" onClick={onDelete} size="sm">
+        Delete
+      </Button>
+    )}
+    {isApprove && (
+      <Button color="primary" onClick={onApprove} size="sm">
+        Approve
+      </Button>
+    )}
+    {isDecline && (
+      <Button color="primary" onClick={onDecline} size="sm">
+        Decline
+      </Button>
+    )}
+
+    {/* <UncontrolledDropdown>
       <DropdownToggle
         className="btn-icon-only text-light"
         href="#pablo"
@@ -69,6 +97,6 @@ export const RotaTableItemsActions: React.SFC<Props> = ({
           Update
         </DropdownItem>
       </DropdownMenu>
-    </UncontrolledDropdown>
+    </UncontrolledDropdown> */}
   </td>
 );
