@@ -79,14 +79,30 @@ class Sidebar extends React.Component<Props, State> {
             <span className="navbar-toggler-icon" />
           </button>
           {logo ? (
-            <Link href="/">
-              <NavbarBrand
-                className="pt-0"
-                style={{ color: "#000", fontSize: "25px" }}
-              >
-                ROTA
-              </NavbarBrand>
-            </Link>
+            <div className="side-bar-top-panel">
+              <Link href="/">
+                <NavbarBrand
+                  className="pt-0"
+                  style={{
+                    fontSize: "45px",
+                    margin: 0,
+                    padding: 0
+                  }}
+                >
+                  ROTA
+                </NavbarBrand>
+              </Link>
+              <div className="top-panel">
+                <Link href="/my-department">
+                  <a>
+                    <img
+                      src={require("../../static/assets/img/icons/Icons/admin icon.png")}
+                    />
+                    <span>Manager, Department</span>
+                  </a>
+                </Link>
+              </div>
+            </div>
           ) : null}
           <Nav className="align-items-center d-md-none">
             <UncontrolledDropdown nav>
@@ -198,6 +214,32 @@ class Sidebar extends React.Component<Props, State> {
                       src={require("../../static/assets/img/icons/Icons/staff.png")}
                     />{" "}
                     Manage Staff
+                  </NavLink>
+                </Link>
+              </NavItem>
+              <NavItem>
+                <Link href={`/manage-schedule`}>
+                  <NavLink
+                    onClick={this.closeCollapse}
+                    activeClassName="active"
+                  >
+                    <img
+                      src={require("../../static/assets/img/icons/Icons/sch.png")}
+                    />{" "}
+                    Manage Schedule
+                  </NavLink>
+                </Link>
+              </NavItem>
+              <NavItem>
+                <Link href={`/manage-leaves`}>
+                  <NavLink
+                    onClick={this.closeCollapse}
+                    activeClassName="active"
+                  >
+                    <img
+                      src={require("../../static/assets/img/icons/Icons/leave.png")}
+                    />{" "}
+                    Manage Leaves
                   </NavLink>
                 </Link>
               </NavItem>

@@ -15,14 +15,10 @@ export const RotaTableItemsSimple: React.SFC<{ text: string }> = ({ text }) => (
 
 interface Props {
   onOpen?: () => void;
-  onDelete: () => void;
-  onUpdate: () => void;
-  onApprove: () => void;
-  onDecline: () => void;
-  isDelete?: boolean;
-  isUpdate?: boolean;
-  isApprove?: boolean;
-  isDecline?: boolean;
+  onDelete?: () => void;
+  onUpdate?: () => void;
+  onApprove?: () => void;
+  onDecline?: () => void;
 }
 
 export const RotaTableItemsActions: React.SFC<Props> = ({
@@ -30,29 +26,25 @@ export const RotaTableItemsActions: React.SFC<Props> = ({
   onUpdate,
   onApprove,
   onDecline,
-  onOpen,
-  isDelete,
-  isUpdate,
-  isApprove,
-  isDecline
+  onOpen
 }) => (
   <td className="text-right">
-    {isUpdate && (
+    {onUpdate && (
       <Button color="primary" onClick={onUpdate} size="sm">
         Update
       </Button>
     )}
-    {isDelete && (
+    {onDelete && (
       <Button color="primary" onClick={onDelete} size="sm">
         Delete
       </Button>
     )}
-    {isApprove && (
+    {onApprove && (
       <Button color="primary" onClick={onApprove} size="sm">
         Approve
       </Button>
     )}
-    {isDecline && (
+    {onDecline && (
       <Button color="primary" onClick={onDecline} size="sm">
         Decline
       </Button>

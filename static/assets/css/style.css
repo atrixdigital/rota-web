@@ -60,3 +60,34 @@ button {
   width: 25px;
   margin-right: 8px;
 }
+
+.footer {
+  background: transparent;
+}
+
+.navbar-vertical {
+  padding: 0 !important;
+  overflow-x: hidden;
+}
+.navbar-nav {
+  padding-left: 10px;
+  padding-right: 10px;
+  margin: 0;
+}
+.side-bar-top-panel {
+  color: #fff;
+  background-color: #172b4d;
+  padding: 10px;
+}
+.side-bar-top-panel a {
+  display: flex;
+  margin-top: 17px;
+  color: #fff;
+}
+.side-bar-top-panel img {
+  width: 25px;
+  height: 25px;
+}
+.side-bar-top-panel span {
+  margin-left: 5px;
+}

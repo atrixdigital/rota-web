@@ -266,7 +266,7 @@ class Crud<T extends {}, I extends {}> extends Component<
                       </FormGroup>
                     </div>
                   </div>
-                  {fields && fields.length > 0 ? (
+                  {/* {fields && fields.length > 0 ? (
                     <div className="col-md-2 col-sm-2">
                       <div className="navbar-search form-inline d-flex ml-lg-auto">
                         <FormGroup className="mb-0">
@@ -294,34 +294,37 @@ class Crud<T extends {}, I extends {}> extends Component<
                         </FormGroup>
                       </div>
                     </div>
-                  ) : null}
+                  ) : null} */}
                 </>
               ) : null}
               {isFilters && (
-                <div className="col-md-2 col-sm-3">
-                  <div className="navbar-search form-inline d-flex ml-lg-auto">
-                    <FormGroup className="mb-0">
-                      <InputGroup className="input-group-alternative">
-                        <Input
-                          placeholder="No. of Pages"
-                          type="select"
-                          value={totalPerPage}
-                          onChange={e => {
-                            this.setState({
-                              totalPerPage: parseInt(e.target.value)
-                            });
-                          }}
-                        >
-                          <option value={10}>10</option>
-                          <option value={20}>20</option>
-                          <option value={50}>50</option>
-                          <option value={100}>100</option>
-                          <option value={500}>500</option>
-                        </Input>
-                      </InputGroup>
-                    </FormGroup>
+                <>
+                  <div style={{ flex: 1 }} />
+                  <div className="col-md-2 col-sm-3">
+                    <div className="navbar-search form-inline d-flex ml-lg-auto">
+                      <FormGroup className="mb-0">
+                        <InputGroup className="input-group-alternative">
+                          <Input
+                            placeholder="No. of Pages"
+                            type="select"
+                            value={totalPerPage}
+                            onChange={e => {
+                              this.setState({
+                                totalPerPage: parseInt(e.target.value)
+                              });
+                            }}
+                          >
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                            <option value={500}>500</option>
+                          </Input>
+                        </InputGroup>
+                      </FormGroup>
+                    </div>
                   </div>
-                </div>
+                </>
               )}
               {isCreate && (
                 <div className="col text-right">

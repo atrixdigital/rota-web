@@ -12,6 +12,10 @@ interface Props {
 }
 
 class AdminLayout extends Component<Props> {
+  componentDidMount() {
+    document.querySelector("body").classList.add("bg-default");
+  }
+
   render() {
     const { pageTitle, me } = this.props;
     return (
