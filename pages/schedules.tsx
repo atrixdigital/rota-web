@@ -21,7 +21,7 @@ import {
 } from "../generated/apolloComponent";
 import { CrudProps } from "../interfaces";
 import { withAuth } from "../lib/withAuth";
-import { validateScheduleSchema } from "../shared/validation-schema";
+import { validateScheduleSchema1 } from "../shared/validation-schema";
 
 interface Props
   extends CrudProps<
@@ -138,7 +138,7 @@ class Schedules extends Component<Props, State> {
                   );
                 }}
                 initialValue={initialValue}
-                validationSchema={validateScheduleSchema}
+                validationSchema={validateScheduleSchema1}
                 onSubmit={async (values, { setSubmitting }) => {
                   setSubmitting(true);
                   if (actionType === "create") {

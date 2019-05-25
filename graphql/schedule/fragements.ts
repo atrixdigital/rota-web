@@ -1,4 +1,6 @@
 import gql from "graphql-tag";
+import { AreaBasicFragment } from "../area/fragements";
+import { RoleBasicFragment } from "../role/fragments";
 import { UserBasicFragment } from "../user/fragements";
 
 export const ScheduleBasicFragment = gql`
@@ -6,11 +8,20 @@ export const ScheduleBasicFragment = gql`
     id
     startTime
     endTime
-    totalHours
-    joinTime
+    startDay
+    coreShift
+    notes
     staff {
       ...UserBasicFragment
     }
+    role {
+      ...RoleBasicFragment
+    }
+    area {
+      ...AreaBasicFragment
+    }
   }
   ${UserBasicFragment}
+  ${RoleBasicFragment}
+  ${AreaBasicFragment}
 `;

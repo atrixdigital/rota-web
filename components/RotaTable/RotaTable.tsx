@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Button,
   CardFooter,
   Pagination,
   PaginationItem,
@@ -13,6 +14,7 @@ interface Props {
   pageNumbers?: number[];
   currentPage?: number;
   onPageChange?: (currentPage: number) => void;
+  onCreateClick?: (() => Promise<void>) | boolean;
 }
 
 export default class RotaTable extends React.Component<Props> {
@@ -40,7 +42,13 @@ export default class RotaTable extends React.Component<Props> {
   };
 
   render() {
-    const { headings, children, pageNumbers, currentPage } = this.props;
+    const {
+      headings,
+      children,
+      pageNumbers,
+      currentPage,
+      onCreateClick
+    } = this.props;
     return (
       <>
         <Table className="align-items-center table-flush" responsive>
@@ -56,49 +64,73 @@ export default class RotaTable extends React.Component<Props> {
         </Table>
         {pageNumbers && pageNumbers.length > 0 ? (
           <CardFooter className="py-4">
-            <nav aria-label="...">
-              <Pagination
-                className="pagination justify-content-end mb-0"
-                listClassName="justify-content-end mb-0"
-              >
-                <PaginationItem className={currentPage <= 1 ? "disabled" : ""}>
-                  <PaginationLink
-                    href="#pablo"
-                    onClick={e => this._onPageChange(e, "previous")}
+            <div className="d-flex align-items-center">
+              {onCreateClick && (
+                <div>
+                  <Button
+                    color="primary"
+                    onClick={
+                      onCreateClick && typeof onCreateClick === "function"
+                        ? onCreateClick
+                        : null
+                    }
+                    size="sm"
                   >
-                    <i className="fas fa-angle-left" />
-                    <span className="sr-only">Previous</span>
-                  </PaginationLink>
-                </PaginationItem>
-                {pageNumbers.map(number => {
-                  return (
+                    Create
+                  </Button>
+                </div>
+              )}
+              <div className="flex-fill">
+                <nav aria-label="...">
+                  <Pagination
+                    className="pagination justify-content-end mb-0"
+                    listClassName="justify-content-end mb-0"
+                  >
                     <PaginationItem
-                      key={number}
-                      className={currentPage === number ? "active" : ""}
+                      className={currentPage <= 1 ? "disabled" : ""}
                     >
                       <PaginationLink
-                        id={number.toString()}
-                        onClick={e => this._onPageChange(e, number)}
+                        href="#pablo"
+                        onClick={e => this._onPageChange(e, "previous")}
                       >
-                        {number}
+                        <i className="fas fa-angle-left" />
+                        <span className="sr-only">Previous</span>
                       </PaginationLink>
                     </PaginationItem>
-                  );
-                })}{" "}
-                <PaginationItem
-                  className={
-                    currentPage >= 1 && currentPage >= pageNumbers.length
-                      ? "disabled"
-                      : ""
-                  }
-                >
-                  <PaginationLink href="#pablo" onClick={this._onPageChange}>
-                    <i className="fas fa-angle-right" />
-                    <span className="sr-only">Next</span>
-                  </PaginationLink>
-                </PaginationItem>
-              </Pagination>
-            </nav>
+                    {pageNumbers.map(number => {
+                      return (
+                        <PaginationItem
+                          key={number}
+                          className={currentPage === number ? "active" : ""}
+                        >
+                          <PaginationLink
+                            id={number.toString()}
+                            onClick={e => this._onPageChange(e, number)}
+                          >
+                            {number}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    })}{" "}
+                    <PaginationItem
+                      className={
+                        currentPage >= 1 && currentPage >= pageNumbers.length
+                          ? "disabled"
+                          : ""
+                      }
+                    >
+                      <PaginationLink
+                        href="#pablo"
+                        onClick={this._onPageChange}
+                      >
+                        <i className="fas fa-angle-right" />
+                        <span className="sr-only">Next</span>
+                      </PaginationLink>
+                    </PaginationItem>
+                  </Pagination>
+                </nav>
+              </div>
+            </div>
           </CardFooter>
         ) : null}
       </>

@@ -21,8 +21,6 @@ import {
   CreateUserMutationFn,
   DeleteByUserIdHOC,
   DeleteByUserIdMutationFn,
-  DepartmentBasicFragmentAreas,
-  DepartmentBasicFragmentRoles,
   GetAllUserByFilterComponent,
   GetAllUserByFilterVariables,
   GetAllUserGetAllUser,
@@ -42,8 +40,6 @@ interface Props
     CreateUserMutationFn
   > {
   me?: MeMe;
-  // getAllRoleNoAuth: GetAllRoleNoAuthQuery;
-  // getAllArea: GetAllAreaQuery;
   approvedUser: ApprovedUserMutationFn;
   variables?: GetAllUserByFilterVariables;
 }
@@ -67,18 +63,10 @@ class ManageStaff extends Component<Props> {
               return (
                 <Row className="mt-5">
                   <Col className="mb-5" xl="12">
-                    <RegisteredStaff
-                      {...this.props}
-                      roles={data.getDepartment.roles}
-                      areas={data.getDepartment.areas}
-                    />
+                    <RegisteredStaff {...this.props} />
                   </Col>
                   <Col className="mb-5" xl="12">
-                    <ApprovedStaffRequest
-                      {...this.props}
-                      roles={data.getDepartment.roles}
-                      areas={data.getDepartment.areas}
-                    />
+                    <ApprovedStaffRequest {...this.props} />
                   </Col>
                 </Row>
               );
@@ -91,8 +79,6 @@ class ManageStaff extends Component<Props> {
 }
 
 export default compose(
-  // GetAllRoleNoAuthHOC({ name: "getAllRoleNoAuth" }),
-  // GetAllAreaHOC({ name: "getAllArea" }),
   DeleteByUserIdHOC({ name: "deleteBy" }),
   UpdateByUserIdHOC({ name: "updateBy" }),
   CreateUserHOC({ name: "create" }),
@@ -111,14 +97,23 @@ interface InitialValue {
   areaID?: string;
 }
 
-interface MoreProps extends Props {
-  roles: DepartmentBasicFragmentRoles[];
-  areas: DepartmentBasicFragmentAreas[];
-}
-
-class RegisteredStaff extends Component<MoreProps> {
+class RegisteredStaff extends Component<Props> {
   render() {
-    const { me, roles, areas, create, updateBy, deleteBy } = this.props;
+    const { me, create, updateBy, deleteBy } = this.props;
+    const roles =
+      me &&
+      me.department &&
+      me.department.roles &&
+      me.department.roles.length > 0
+        ? me.department.roles
+        : [];
+    const areas =
+      me &&
+      me.department &&
+      me.department.areas &&
+      me.department.areas.length > 0
+        ? me.department.areas
+        : [];
     return (
       <GetAllUserByFilterComponent
         variables={{
@@ -328,9 +323,23 @@ class RegisteredStaff extends Component<MoreProps> {
   }
 }
 
-class ApprovedStaffRequest extends Component<MoreProps> {
+class ApprovedStaffRequest extends Component<Props> {
   render() {
-    const { me, roles, areas, create, updateBy } = this.props;
+    const { me, create, updateBy } = this.props;
+    const roles =
+      me &&
+      me.department &&
+      me.department.roles &&
+      me.department.roles.length > 0
+        ? me.department.roles
+        : [];
+    const areas =
+      me &&
+      me.department &&
+      me.department.areas &&
+      me.department.areas.length > 0
+        ? me.department.areas
+        : [];
     return (
       <GetAllUserByFilterComponent
         variables={{

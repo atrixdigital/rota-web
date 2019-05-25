@@ -91,3 +91,6 @@ button {
 .side-bar-top-panel span {
   margin-left: 5px;
 }
+.btn-rounded {
+  border-radius: 3rem;
+}

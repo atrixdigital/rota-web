@@ -51,11 +51,21 @@ export interface CreateScheduleInput {
 
   endTime: string;
 
-  totalHours: number;
+  startDay: number;
+
+  notes?: Maybe<string>;
+
+  coreShift: string;
 
   joinTime?: Maybe<string>;
 
-  staffID: string;
+  staffID?: Maybe<string>;
+
+  roleID: string;
+
+  areaID: string;
+
+  departmentID?: Maybe<string>;
 }
 
 export interface UpdateScheduleInput {
@@ -63,11 +73,21 @@ export interface UpdateScheduleInput {
 
   endTime: string;
 
-  totalHours: number;
+  startDay: number;
+
+  notes?: Maybe<string>;
+
+  coreShift: string;
 
   joinTime?: Maybe<string>;
 
-  staffID: string;
+  staffID?: Maybe<string>;
+
+  roleID: string;
+
+  areaID: string;
+
+  departmentID?: Maybe<string>;
 }
 
 export interface CreateRoleInput {
@@ -76,18 +96,6 @@ export interface CreateRoleInput {
 
 export interface UpdateRoleInput {
   title: string;
-}
-
-export interface CreateHospitalInput {
-  title: string;
-
-  adminID: string;
-}
-
-export interface UpdateHospitalInput {
-  title: string;
-
-  adminID: string;
 }
 
 export interface CreateDepartmentInput {
@@ -405,6 +413,18 @@ export type GetAllScheduleQuery = {
 
 export type GetAllScheduleGetAllSchedule = ScheduleBasicFragmentFragment;
 
+export type GetMySchedulesVariables = {
+  startDay: number;
+};
+
+export type GetMySchedulesQuery = {
+  __typename?: "Query";
+
+  getMySchedules: GetMySchedulesGetMySchedules[];
+};
+
+export type GetMySchedulesGetMySchedules = ScheduleBasicFragmentFragment;
+
 export type ApprovedUserVariables = {
   approved: boolean;
   userID: string;
@@ -655,14 +675,24 @@ export type ScheduleBasicFragmentFragment = {
 
   endTime: string;
 
-  totalHours: number;
+  startDay: number;
 
-  joinTime: Maybe<string>;
+  coreShift: string;
+
+  notes: Maybe<string>;
 
   staff: Maybe<ScheduleBasicFragmentStaff>;
+
+  role: Maybe<ScheduleBasicFragmentRole>;
+
+  area: Maybe<ScheduleBasicFragmentArea>;
 };
 
 export type ScheduleBasicFragmentStaff = UserBasicFragmentFragment;
+
+export type ScheduleBasicFragmentRole = RoleBasicFragmentFragment;
+
+export type ScheduleBasicFragmentArea = AreaBasicFragmentFragment;
 
 export type UserBasicFragmentFragment = {
   __typename?: "User";
@@ -706,20 +736,6 @@ import gql from "graphql-tag";
 // ====================================================
 // Fragments
 // ====================================================
-
-export const AreaBasicFragmentFragmentDoc = gql`
-  fragment AreaBasicFragment on Area {
-    id
-    title
-  }
-`;
-
-export const RoleBasicFragmentFragmentDoc = gql`
-  fragment RoleBasicFragment on Role {
-    id
-    title
-  }
-`;
 
 export const DepartmentBasicFragmentFragmentDoc = gql`
   fragment DepartmentBasicFragment on Department {
@@ -768,19 +784,42 @@ export const UserBasicFragmentFragmentDoc = gql`
   ${DepartmentBasicFragmentFragmentDoc}
 `;
 
+export const RoleBasicFragmentFragmentDoc = gql`
+  fragment RoleBasicFragment on Role {
+    id
+    title
+  }
+`;
+
+export const AreaBasicFragmentFragmentDoc = gql`
+  fragment AreaBasicFragment on Area {
+    id
+    title
+  }
+`;
+
 export const ScheduleBasicFragmentFragmentDoc = gql`
   fragment ScheduleBasicFragment on Schedule {
     id
     startTime
     endTime
-    totalHours
-    joinTime
+    startDay
+    coreShift
+    notes
     staff {
       ...UserBasicFragment
+    }
+    role {
+      ...RoleBasicFragment
+    }
+    area {
+      ...AreaBasicFragment
     }
   }
 
   ${UserBasicFragmentFragmentDoc}
+  ${RoleBasicFragmentFragmentDoc}
+  ${AreaBasicFragmentFragmentDoc}
 `;
 
 // ====================================================
@@ -1878,6 +1917,48 @@ export function GetAllScheduleHOC<TProps, TChildProps = any>(
     GetAllScheduleVariables,
     GetAllScheduleProps<TChildProps>
   >(GetAllScheduleDocument, operationOptions);
+}
+export const GetMySchedulesDocument = gql`
+  query GetMySchedules($startDay: Float!) {
+    getMySchedules(startDay: $startDay) {
+      ...ScheduleBasicFragment
+    }
+  }
+
+  ${ScheduleBasicFragmentFragmentDoc}
+`;
+export class GetMySchedulesComponent extends React.Component<
+  Partial<ReactApollo.QueryProps<GetMySchedulesQuery, GetMySchedulesVariables>>
+> {
+  render() {
+    return (
+      <ReactApollo.Query<GetMySchedulesQuery, GetMySchedulesVariables>
+        query={GetMySchedulesDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type GetMySchedulesProps<TChildProps = any> = Partial<
+  ReactApollo.DataProps<GetMySchedulesQuery, GetMySchedulesVariables>
+> &
+  TChildProps;
+export function GetMySchedulesHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        GetMySchedulesQuery,
+        GetMySchedulesVariables,
+        GetMySchedulesProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    GetMySchedulesQuery,
+    GetMySchedulesVariables,
+    GetMySchedulesProps<TChildProps>
+  >(GetMySchedulesDocument, operationOptions);
 }
 export const ApprovedUserDocument = gql`
   mutation ApprovedUser($approved: Boolean!, $userID: String!) {

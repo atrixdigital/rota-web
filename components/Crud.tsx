@@ -24,8 +24,10 @@ interface FiltersClause {
   isTypeFilter?: boolean;
 }
 
+type CreateButtonLocation = "bottom-left" | "top-right";
+
 interface Props<T, I> {
-  pageTitle: string;
+  pageTitle: (() => JSX.Element) | string;
   items: T[];
   fields: string[];
   loading: boolean;
@@ -40,6 +42,7 @@ interface Props<T, I> {
   isModalOpen: boolean;
   me?: MeMe;
   isCreate?: boolean;
+  createLocation?: CreateButtonLocation;
   onDelete?: () => void;
   isFilters?: boolean;
   filters?: FiltersClause;
@@ -124,6 +127,12 @@ class Crud<T extends {}, I extends {}> extends Component<
     return { pageNumbers, currentItems };
   };
 
+  _onCreateClick = async () => {
+    const { changeActionType, toggleModal } = this.props;
+    await changeActionType();
+    toggleModal();
+  };
+
   render() {
     const {
       pageTitle,
@@ -140,6 +149,7 @@ class Crud<T extends {}, I extends {}> extends Component<
       isModalOpen,
       me,
       isCreate,
+      createLocation,
       onDelete,
       isFilters,
       filters,
@@ -160,9 +170,11 @@ class Crud<T extends {}, I extends {}> extends Component<
       <>
         <Card className="shadow">
           <CardHeader className="border-0">
-            <h3 className="mb-3">{pageTitle}</h3>
+            <h3 className="mb-3">
+              {typeof pageTitle === "function" ? pageTitle() : pageTitle}
+            </h3>
             <Row className="align-items-center">
-              {isFilters && filters ? (
+              {isFilters && filters && items.length > 0 ? (
                 <>
                   {filters.isAreaFilter ? (
                     <div className="col-md-2 col-sm-6">
@@ -283,7 +295,7 @@ class Crud<T extends {}, I extends {}> extends Component<
                   ) : null} */}
                 </>
               ) : null}
-              {isFilters && (
+              {isFilters && items.length > 0 && (
                 <>
                   <div style={{ flex: 1 }} />
                   <div className="col-md-2 col-sm-3">
@@ -312,15 +324,12 @@ class Crud<T extends {}, I extends {}> extends Component<
                   </div>
                 </>
               )}
-              {isCreate || onDelete ? (
+              {(isCreate && createLocation === "top-right") || onDelete ? (
                 <div className="col text-right">
-                  {isCreate && (
+                  {isCreate && createLocation === "top-right" && (
                     <Button
                       color="primary"
-                      onClick={async () => {
-                        await changeActionType();
-                        toggleModal();
-                      }}
+                      onClick={this._onCreateClick}
                       size="sm"
                     >
                       Create
@@ -343,6 +352,11 @@ class Crud<T extends {}, I extends {}> extends Component<
               pageNumbers={pageNumbers}
               currentPage={currentPage}
               onPageChange={this._onPageChange}
+              onCreateClick={
+                isCreate && createLocation === "bottom-left"
+                  ? this._onCreateClick
+                  : false
+              }
             >
               {currentItems
                 .filter(item => {
