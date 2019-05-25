@@ -454,8 +454,20 @@ class ManageSchedule extends Component<Props, State> {
                                 await create({
                                   variables: {
                                     data: {
-                                      startTime: startTime.getTime().toString(),
-                                      endTime: endTime.getTime().toString(),
+                                      startTime: `${`${startTime.getHours()}`.padStart(
+                                        2,
+                                        "0"
+                                      )}:${`${startTime.getMinutes()}`.padStart(
+                                        2,
+                                        "0"
+                                      )}`,
+                                      endTime: `${`${endTime.getHours()}`.padStart(
+                                        2,
+                                        "0"
+                                      )}:${`${endTime.getMinutes()}`.padStart(
+                                        2,
+                                        "0"
+                                      )}`,
                                       startDay,
                                       notes,
                                       coreShift,
@@ -502,13 +514,14 @@ class ManageSchedule extends Component<Props, State> {
                                     name="staffID"
                                     componentType="select"
                                     options={
-                                      []
-                                      // getAllUserByRole.length > 0
-                                      //   ? getAllUserByRole.map(({ id, name }) => ({
-                                      //       id,
-                                      //       title: name
-                                      //     }))
-                                      //   : []
+                                      getAllUserByFilter.length > 0
+                                        ? getAllUserByFilter.map(
+                                            ({ id, name }) => ({
+                                              id,
+                                              title: name
+                                            })
+                                          )
+                                        : []
                                     }
                                   />
                                   <SelectField
@@ -516,13 +529,17 @@ class ManageSchedule extends Component<Props, State> {
                                     name="roleID"
                                     componentType="select"
                                     options={
-                                      []
-                                      // getAllUserByRole.length > 0
-                                      //   ? getAllUserByRole.map(({ id, name }) => ({
-                                      //       id,
-                                      //       title: name
-                                      //     }))
-                                      //   : []
+                                      me &&
+                                      me.department &&
+                                      me.department.roles &&
+                                      me.department.roles.length > 0
+                                        ? me.department.roles.map(
+                                            ({ id, title }) => ({
+                                              id,
+                                              title
+                                            })
+                                          )
+                                        : []
                                     }
                                   />
                                   <SelectField
@@ -530,13 +547,17 @@ class ManageSchedule extends Component<Props, State> {
                                     name="areaID"
                                     componentType="select"
                                     options={
-                                      []
-                                      // getAllUserByRole.length > 0
-                                      //   ? getAllUserByRole.map(({ id, name }) => ({
-                                      //       id,
-                                      //       title: name
-                                      //     }))
-                                      //   : []
+                                      me &&
+                                      me.department &&
+                                      me.department.areas &&
+                                      me.department.areas.length > 0
+                                        ? me.department.areas.map(
+                                            ({ id, title }) => ({
+                                              id,
+                                              title
+                                            })
+                                          )
+                                        : []
                                     }
                                   />
                                 </>
