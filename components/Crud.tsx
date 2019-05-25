@@ -15,11 +15,7 @@ import {
   ModalHeader,
   Row
 } from "reactstrap";
-import {
-  GetAllAreaComponent,
-  GetAllRoleNoAuthComponent,
-  MeMe
-} from "../generated/apolloComponent";
+import { MeMe } from "../generated/apolloComponent";
 import Loader from "./Loader";
 import RotaTable from "./RotaTable/RotaTable";
 
@@ -47,6 +43,8 @@ interface Props<T, I> {
   onDelete?: () => void;
   isFilters?: boolean;
   filters?: FiltersClause;
+  renderTypes?: () => JSX.Element[];
+  renderAreas?: () => JSX.Element[];
 }
 
 interface State<T> {
@@ -144,7 +142,9 @@ class Crud<T extends {}, I extends {}> extends Component<
       isCreate,
       onDelete,
       isFilters,
-      filters
+      filters,
+      renderAreas,
+      renderTypes
     } = this.props;
     const {
       items,
@@ -166,27 +166,22 @@ class Crud<T extends {}, I extends {}> extends Component<
                 <>
                   {filters.isAreaFilter ? (
                     <div className="col-md-2 col-sm-6">
-                      <GetAllAreaComponent>
-                        {({ data, loading }) => {
-                          if (loading) {
-                            return <Loader />;
-                          }
-                          return (
-                            <div className="navbar-search form-inline d-flex ml-lg-auto">
-                              <FormGroup className="mb-0">
-                                <InputGroup className="input-group-alternative">
-                                  <Input
-                                    placeholder="Select Area"
-                                    type="select"
-                                    value={areaFieldValue}
-                                    onChange={e => {
-                                      this.setState({
-                                        areaFieldValue: e.target.value
-                                      });
-                                    }}
-                                  >
-                                    <option value="">Select Area</option>
-                                    {data &&
+                      <div className="navbar-search form-inline d-flex ml-lg-auto">
+                        <FormGroup className="mb-0">
+                          <InputGroup className="input-group-alternative">
+                            <Input
+                              placeholder="Select Area"
+                              type="select"
+                              value={areaFieldValue}
+                              onChange={e => {
+                                this.setState({
+                                  areaFieldValue: e.target.value
+                                });
+                              }}
+                            >
+                              <option value="">Select Area</option>
+                              {renderAreas()}
+                              {/* {data &&
                                       data.getAllArea &&
                                       data.getAllArea.length > 0 &&
                                       data.getAllArea.map(({ id, title }) => {
@@ -195,39 +190,31 @@ class Crud<T extends {}, I extends {}> extends Component<
                                             {title}
                                           </option>
                                         );
-                                      })}
-                                  </Input>
-                                </InputGroup>
-                              </FormGroup>
-                            </div>
-                          );
-                        }}
-                      </GetAllAreaComponent>
+                                      })} */}
+                            </Input>
+                          </InputGroup>
+                        </FormGroup>
+                      </div>
                     </div>
                   ) : null}
                   {filters.isTypeFilter && (
                     <div className="col-md-2 col-sm-6">
-                      <GetAllRoleNoAuthComponent>
-                        {({ data, loading }) => {
-                          if (loading) {
-                            return <Loader />;
-                          }
-                          return (
-                            <div className="navbar-search form-inline d-flex ml-lg-auto">
-                              <FormGroup className="mb-0">
-                                <InputGroup className="input-group-alternative">
-                                  <Input
-                                    placeholder="Select Type"
-                                    type="select"
-                                    value={typeFieldValue}
-                                    onChange={e => {
-                                      this.setState({
-                                        typeFieldValue: e.target.value
-                                      });
-                                    }}
-                                  >
-                                    <option value="">Select Type</option>
-                                    {data &&
+                      <div className="navbar-search form-inline d-flex ml-lg-auto">
+                        <FormGroup className="mb-0">
+                          <InputGroup className="input-group-alternative">
+                            <Input
+                              placeholder="Select Type"
+                              type="select"
+                              value={typeFieldValue}
+                              onChange={e => {
+                                this.setState({
+                                  typeFieldValue: e.target.value
+                                });
+                              }}
+                            >
+                              <option value="">Select Type</option>
+                              {renderTypes()}
+                              {/* {data &&
                                       data.getAllRoleNoAuth &&
                                       data.getAllRoleNoAuth.length > 0 &&
                                       data.getAllRoleNoAuth
@@ -240,14 +227,11 @@ class Crud<T extends {}, I extends {}> extends Component<
                                               {title}
                                             </option>
                                           );
-                                        })}
-                                  </Input>
-                                </InputGroup>
-                              </FormGroup>
-                            </div>
-                          );
-                        }}
-                      </GetAllRoleNoAuthComponent>
+                                        })} */}
+                            </Input>
+                          </InputGroup>
+                        </FormGroup>
+                      </div>
                     </div>
                   )}
                   <div className="col-md-3 col-sm-8">

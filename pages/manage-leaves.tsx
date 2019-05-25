@@ -33,7 +33,6 @@ interface Props
 class ManageLeaves extends Component<Props> {
   render() {
     const { me } = this.props;
-    console.log(me);
     return (
       <AdminLayout pageTitle="Manage Leaves" me={me}>
         <Header />

@@ -1,25 +1,24 @@
+import { Field, Form, Formik } from "formik";
+import Router from "next/router";
 import React from "react";
-
 // reactstrap components
 import {
   Button,
   Card,
   CardBody,
+  Col,
   FormGroup,
-  InputGroupAddon,
-  InputGroupText,
   InputGroup,
-  Col
+  InputGroupAddon,
+  InputGroupText
 } from "reactstrap";
+import InputField from "../components/input-field";
 import Layout from "../components/Layout";
 import {
-  RegisterComponent,
-  GetAllRoleNoAuthComponent
+  GetAllRoleNoAuthComponent,
+  RegisterComponent
 } from "../generated/apolloComponent";
-import { Formik, Form, Field } from "formik";
 import { validateRegisterSchema } from "../shared/validation-schema";
-import InputField from "../components/input-field";
-import Router from "next/router";
 
 interface FormValues {
   firstName: string;
@@ -59,7 +58,6 @@ class Register extends React.Component {
                 }}
                 validationSchema={validateRegisterSchema}
                 render={({ isSubmitting, handleSubmit, errors }) => {
-                  console.log(errors);
                   return (
                     <Card className="bg-secondary shadow border-0">
                       <CardBody className="px-lg-5 py-lg-5">

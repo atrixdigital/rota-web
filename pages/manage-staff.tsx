@@ -11,6 +11,7 @@ import {
   TextField
 } from "../components/FormFields";
 import Header from "../components/Headers/Header";
+import Loader from "../components/Loader";
 import ModalHandlerHOC from "../components/ModalHandlerHOC";
 import UserTableRow from "../components/UserTableRow";
 import {
@@ -20,13 +21,12 @@ import {
   CreateUserMutationFn,
   DeleteByUserIdHOC,
   DeleteByUserIdMutationFn,
-  GetAllAreaHOC,
-  GetAllAreaQuery,
-  GetAllRoleNoAuthHOC,
-  GetAllRoleNoAuthQuery,
+  DepartmentBasicFragmentAreas,
+  DepartmentBasicFragmentRoles,
   GetAllUserByFilterComponent,
   GetAllUserByFilterVariables,
   GetAllUserGetAllUser,
+  GetDepartmentComponent,
   MeMe,
   UpdateByUserIdHOC,
   UpdateByUserIdMutationFn
@@ -42,8 +42,8 @@ interface Props
     CreateUserMutationFn
   > {
   me?: MeMe;
-  getAllRoleNoAuth: GetAllRoleNoAuthQuery;
-  getAllArea: GetAllAreaQuery;
+  // getAllRoleNoAuth: GetAllRoleNoAuthQuery;
+  // getAllArea: GetAllAreaQuery;
   approvedUser: ApprovedUserMutationFn;
   variables?: GetAllUserByFilterVariables;
 }
@@ -51,20 +51,39 @@ interface Props
 class ManageStaff extends Component<Props> {
   render() {
     const { me } = this.props;
-    console.log(me);
     return (
       <AdminLayout pageTitle="Manage Staff" me={me}>
         <Header />
         {/* Page content */}
         <Container className="mt--7" fluid>
-          <Row className="mt-5">
-            <Col className="mb-5" xl="12">
-              <RegisteredStaff {...this.props} />
-            </Col>
-            <Col className="mb-5" xl="12">
-              <ApprovedStaffRequest {...this.props} />
-            </Col>
-          </Row>
+          <GetDepartmentComponent
+            variables={{ id: me.department.id }}
+            fetchPolicy="cache-and-network"
+          >
+            {({ data, loading }) => {
+              if (loading) {
+                return <Loader />;
+              }
+              return (
+                <Row className="mt-5">
+                  <Col className="mb-5" xl="12">
+                    <RegisteredStaff
+                      {...this.props}
+                      roles={data.getDepartment.roles}
+                      areas={data.getDepartment.areas}
+                    />
+                  </Col>
+                  <Col className="mb-5" xl="12">
+                    <ApprovedStaffRequest
+                      {...this.props}
+                      roles={data.getDepartment.roles}
+                      areas={data.getDepartment.areas}
+                    />
+                  </Col>
+                </Row>
+              );
+            }}
+          </GetDepartmentComponent>
         </Container>
       </AdminLayout>
     );
@@ -72,8 +91,8 @@ class ManageStaff extends Component<Props> {
 }
 
 export default compose(
-  GetAllRoleNoAuthHOC({ name: "getAllRoleNoAuth" }),
-  GetAllAreaHOC({ name: "getAllArea" }),
+  // GetAllRoleNoAuthHOC({ name: "getAllRoleNoAuth" }),
+  // GetAllAreaHOC({ name: "getAllArea" }),
   DeleteByUserIdHOC({ name: "deleteBy" }),
   UpdateByUserIdHOC({ name: "updateBy" }),
   CreateUserHOC({ name: "create" }),
@@ -92,16 +111,14 @@ interface InitialValue {
   areaID?: string;
 }
 
-class RegisteredStaff extends Component<Props> {
+interface MoreProps extends Props {
+  roles: DepartmentBasicFragmentRoles[];
+  areas: DepartmentBasicFragmentAreas[];
+}
+
+class RegisteredStaff extends Component<MoreProps> {
   render() {
-    const {
-      me,
-      getAllRoleNoAuth: { getAllRoleNoAuth },
-      getAllArea: { getAllArea },
-      create,
-      updateBy,
-      deleteBy
-    } = this.props;
+    const { me, roles, areas, create, updateBy, deleteBy } = this.props;
     return (
       <GetAllUserByFilterComponent
         variables={{
@@ -141,6 +158,24 @@ class RegisteredStaff extends Component<Props> {
                       isAreaFilter: true,
                       isTypeFilter: true
                     }}
+                    renderTypes={() =>
+                      roles.map(({ id, title }) => {
+                        return (
+                          <option key={id} value={id}>
+                            {title}
+                          </option>
+                        );
+                      })
+                    }
+                    renderAreas={() =>
+                      areas.map(({ id, title }) => {
+                        return (
+                          <option key={id} value={id}>
+                            {title}
+                          </option>
+                        );
+                      })
+                    }
                     me={me}
                     toggleModal={toggleModal}
                     isModalOpen={modal}
@@ -258,13 +293,11 @@ class RegisteredStaff extends Component<Props> {
                             name="roleID"
                             componentType="select"
                             options={
-                              getAllRoleNoAuth.length > 0
-                                ? getAllRoleNoAuth
-                                    .filter(({ title }) => title !== "Manager")
-                                    .map(({ id, title }) => ({
-                                      id,
-                                      title
-                                    }))
+                              roles.length > 0
+                                ? roles.map(({ id, title }) => ({
+                                    id,
+                                    title
+                                  }))
                                 : []
                             }
                           />
@@ -273,8 +306,8 @@ class RegisteredStaff extends Component<Props> {
                             name="areaID"
                             componentType="select"
                             options={
-                              getAllArea.length > 0
-                                ? getAllArea.map(({ id, title }) => ({
+                              areas.length > 0
+                                ? areas.map(({ id, title }) => ({
                                     id,
                                     title
                                   }))
@@ -295,15 +328,9 @@ class RegisteredStaff extends Component<Props> {
   }
 }
 
-class ApprovedStaffRequest extends Component<Props> {
+class ApprovedStaffRequest extends Component<MoreProps> {
   render() {
-    const {
-      me,
-      getAllRoleNoAuth: { getAllRoleNoAuth },
-      getAllArea: { getAllArea },
-      create,
-      updateBy
-    } = this.props;
+    const { me, roles, areas, create, updateBy } = this.props;
     return (
       <GetAllUserByFilterComponent
         variables={{
@@ -477,8 +504,8 @@ class ApprovedStaffRequest extends Component<Props> {
                             name="roleID"
                             componentType="select"
                             options={
-                              getAllRoleNoAuth.length > 0
-                                ? getAllRoleNoAuth
+                              roles.length > 0
+                                ? roles
                                     .filter(({ title }) => title !== "Manager")
                                     .map(({ id, title }) => ({
                                       id,
@@ -492,8 +519,8 @@ class ApprovedStaffRequest extends Component<Props> {
                             name="areaID"
                             componentType="select"
                             options={
-                              getAllArea.length > 0
-                                ? getAllArea.map(({ id, title }) => ({
+                              areas.length > 0
+                                ? areas.map(({ id, title }) => ({
                                     id,
                                     title
                                   }))
@@ -513,25 +540,3 @@ class ApprovedStaffRequest extends Component<Props> {
     );
   }
 }
-
-// class ApprovedStaffRequest extends Component<Props> {
-//   render() {
-//     const { me } = this.props;
-//     const variables: GetAllUserByFilterVariables = {
-//       data: {
-//         roleType: "*",
-//         approved: false
-//       }
-//     };
-//     return (
-//       <Users
-//         me={me}
-//         pageTitle="Approved Staff Request"
-//         variables={variables}
-//         isCreate={true}
-//         isApprove={true}
-//         isDecline={true}
-//       />
-//     );
-//   }
-// }
