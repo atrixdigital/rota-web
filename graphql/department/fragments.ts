@@ -6,5 +6,21 @@ export const DepartmentBasicFragment = gql`
     title
     email
     phone
+    manager {
+      id
+      name
+    }
+    staffs {
+      id
+      name
+    }
+    roles {
+      id
+      title
+    }
+    areas {
+      id
+      title
+    }
   }
 `;

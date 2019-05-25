@@ -1,4 +1,5 @@
 import gql from "graphql-tag";
+import { DepartmentBasicFragment } from "../department/fragments";
 
 export const UserBasicFragment = gql`
   fragment UserBasicFragment on User {
@@ -14,5 +15,9 @@ export const UserBasicFragment = gql`
       id
       title
     }
+    department {
+      ...DepartmentBasicFragment
+    }
   }
+  ${DepartmentBasicFragment}
 `;

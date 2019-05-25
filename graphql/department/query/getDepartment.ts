@@ -1,9 +1,9 @@
 import gql from "graphql-tag";
 import { DepartmentBasicFragment } from "../fragments";
 
-export const getAllDepartment = gql`
-  query GetAllDepartment {
-    getAllDepartment {
+export const getDepartment = gql`
+  query GetDepartment($id: String!) {
+    getDepartment(id: $id) {
       ...DepartmentBasicFragment
     }
   }

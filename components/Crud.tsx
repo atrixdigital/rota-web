@@ -40,10 +40,11 @@ interface Props<T, I> {
   validationSchema: any;
   changeActionType: (type?: string) => Promise<void>;
   getActionType: () => string;
-  generateFormFields: () => JSX.Element;
+  generateFormFields: (values: I) => JSX.Element;
   isModalOpen: boolean;
   me?: MeMe;
   isCreate?: boolean;
+  onDelete?: () => void;
   isFilters?: boolean;
   filters?: FiltersClause;
 }
@@ -141,6 +142,7 @@ class Crud<T extends {}, I extends {}> extends Component<
       isModalOpen,
       me,
       isCreate,
+      onDelete,
       isFilters,
       filters
     } = this.props;
@@ -326,20 +328,27 @@ class Crud<T extends {}, I extends {}> extends Component<
                   </div>
                 </>
               )}
-              {isCreate && (
+              {isCreate || onDelete ? (
                 <div className="col text-right">
-                  <Button
-                    color="primary"
-                    onClick={async () => {
-                      await changeActionType();
-                      toggleModal();
-                    }}
-                    size="sm"
-                  >
-                    Create
-                  </Button>
+                  {isCreate && (
+                    <Button
+                      color="primary"
+                      onClick={async () => {
+                        await changeActionType();
+                        toggleModal();
+                      }}
+                      size="sm"
+                    >
+                      Create
+                    </Button>
+                  )}
+                  {onDelete && (
+                    <Button color="primary" onClick={onDelete} size="sm">
+                      Delete
+                    </Button>
+                  )}
                 </div>
-              )}
+              ) : null}
             </Row>
           </CardHeader>
           {/* render data and table */}
@@ -387,16 +396,14 @@ class Crud<T extends {}, I extends {}> extends Component<
             initialValues={initialValue}
             onSubmit={onSubmit}
             validationSchema={validationSchema}
-            render={({ isSubmitting }) => {
+            render={({ isSubmitting, values }) => {
               return (
                 <Form>
                   <ModalHeader toggle={toggleModal}>
                     {getActionType()} {pageTitle}
                   </ModalHeader>
                   <ModalBody>
-                    <div className="pl-lg-4">
-                      <Row>{generateFormFields()}</Row>
-                    </div>
+                    <Row>{generateFormFields(values)}</Row>
                   </ModalBody>
                   <ModalFooter>
                     <Button

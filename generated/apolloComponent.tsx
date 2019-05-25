@@ -25,8 +25,6 @@ export interface CreateUserInput {
 
   roleID: string;
 
-  departmentID?: Maybe<string>;
-
   areaID?: Maybe<string>;
 }
 
@@ -44,8 +42,6 @@ export interface UpdateUserInput {
   appproved?: Maybe<boolean>;
 
   roleID: string;
-
-  departmentID?: Maybe<string>;
 
   areaID?: Maybe<string>;
 }
@@ -101,7 +97,7 @@ export interface CreateDepartmentInput {
 
   phone: string;
 
-  hospitalID: string;
+  managerID: string;
 }
 
 export interface UpdateDepartmentInput {
@@ -111,19 +107,39 @@ export interface UpdateDepartmentInput {
 
   phone: string;
 
-  hospitalID: string;
+  managerID: string;
 }
 
 export interface CreateAreaInput {
   title: string;
-
-  departmentID: string;
 }
 
 export interface UpdateAreaInput {
   title: string;
+}
 
+export interface AssignAreaDepartmentsInput {
+  areaID: string;
+
+  departmentIDs: string[];
+}
+
+export interface AssignDepartmentRolesInput {
   departmentID: string;
+
+  roleIDs: string[];
+}
+
+export interface AssignDepartmentAreasInput {
+  departmentID: string;
+
+  areaIDs: string[];
+}
+
+export interface AssignRoleDepartmentsInput {
+  roleID: string;
+
+  departmentIDs: string[];
 }
 
 export interface ChangePasswordInput {
@@ -136,6 +152,30 @@ export interface ChangePasswordInput {
 // Documents
 // ====================================================
 
+export type AssignAreaDepartmentsVariables = {
+  data: AssignAreaDepartmentsInput;
+};
+
+export type AssignAreaDepartmentsMutation = {
+  __typename?: "Mutation";
+
+  assignAreaDepartments: AssignAreaDepartmentsAssignAreaDepartments;
+};
+
+export type AssignAreaDepartmentsAssignAreaDepartments = AreaBasicFragmentFragment;
+
+export type CreateAreaVariables = {
+  data: CreateAreaInput;
+};
+
+export type CreateAreaMutation = {
+  __typename?: "Mutation";
+
+  createArea: CreateAreaCreateArea;
+};
+
+export type CreateAreaCreateArea = AreaBasicFragmentFragment;
+
 export type GetAllAreaVariables = {};
 
 export type GetAllAreaQuery = {
@@ -145,6 +185,30 @@ export type GetAllAreaQuery = {
 };
 
 export type GetAllAreaGetAllArea = AreaBasicFragmentFragment;
+
+export type AssignDepartmentAreasVariables = {
+  data: AssignDepartmentAreasInput;
+};
+
+export type AssignDepartmentAreasMutation = {
+  __typename?: "Mutation";
+
+  assignDepartmentAreas: AssignDepartmentAreasAssignDepartmentAreas;
+};
+
+export type AssignDepartmentAreasAssignDepartmentAreas = DepartmentBasicFragmentFragment;
+
+export type AssignDepartmentRolesVariables = {
+  data: AssignDepartmentRolesInput;
+};
+
+export type AssignDepartmentRolesMutation = {
+  __typename?: "Mutation";
+
+  assignDepartmentRoles: AssignDepartmentRolesAssignDepartmentRoles;
+};
+
+export type AssignDepartmentRolesAssignDepartmentRoles = DepartmentBasicFragmentFragment;
 
 export type CreateDepartmentVariables = {
   data: CreateDepartmentInput;
@@ -168,6 +232,26 @@ export type DeleteByDepartmentIdMutation = {
   deleteByDepartmentID: boolean;
 };
 
+export type RemoveDepartmentAreasVariables = {
+  data: AssignDepartmentAreasInput;
+};
+
+export type RemoveDepartmentAreasMutation = {
+  __typename?: "Mutation";
+
+  removeDepartmentAreas: boolean;
+};
+
+export type RemoveDepartmentRolesVariables = {
+  data: AssignDepartmentRolesInput;
+};
+
+export type RemoveDepartmentRolesMutation = {
+  __typename?: "Mutation";
+
+  removeDepartmentRoles: boolean;
+};
+
 export type UpdateByDepartmentIdVariables = {
   id: string;
   data: UpdateDepartmentInput;
@@ -189,29 +273,31 @@ export type GetAllDepartmentQuery = {
   getAllDepartment: GetAllDepartmentGetAllDepartment[];
 };
 
-export type GetAllDepartmentGetAllDepartment = {
-  __typename?: "Department";
+export type GetAllDepartmentGetAllDepartment = DepartmentBasicFragmentFragment;
 
-  manager: GetAllDepartmentManager;
-
-  staffs: GetAllDepartmentStaffs[];
-} & DepartmentBasicFragmentFragment;
-
-export type GetAllDepartmentManager = {
-  __typename?: "User";
-
+export type GetDepartmentVariables = {
   id: string;
-
-  name: string;
 };
 
-export type GetAllDepartmentStaffs = {
-  __typename?: "User";
+export type GetDepartmentQuery = {
+  __typename?: "Query";
 
-  id: string;
-
-  name: string;
+  getDepartment: GetDepartmentGetDepartment;
 };
+
+export type GetDepartmentGetDepartment = DepartmentBasicFragmentFragment;
+
+export type AssignRoleDepartmentsVariables = {
+  data: AssignRoleDepartmentsInput;
+};
+
+export type AssignRoleDepartmentsMutation = {
+  __typename?: "Mutation";
+
+  assignRoleDepartments: AssignRoleDepartmentsAssignRoleDepartments;
+};
+
+export type AssignRoleDepartmentsAssignRoleDepartments = RoleBasicFragmentFragment;
 
 export type CreateRoleVariables = {
   data: CreateRoleInput;
@@ -510,6 +596,46 @@ export type DepartmentBasicFragmentFragment = {
   email: string;
 
   phone: string;
+
+  manager: DepartmentBasicFragmentManager;
+
+  staffs: DepartmentBasicFragmentStaffs[];
+
+  roles: DepartmentBasicFragmentRoles[];
+
+  areas: DepartmentBasicFragmentAreas[];
+};
+
+export type DepartmentBasicFragmentManager = {
+  __typename?: "User";
+
+  id: string;
+
+  name: string;
+};
+
+export type DepartmentBasicFragmentStaffs = {
+  __typename?: "User";
+
+  id: string;
+
+  name: string;
+};
+
+export type DepartmentBasicFragmentRoles = {
+  __typename?: "Role";
+
+  id: string;
+
+  title: string;
+};
+
+export type DepartmentBasicFragmentAreas = {
+  __typename?: "Area";
+
+  id: string;
+
+  title: string;
 };
 
 export type RoleBasicFragmentFragment = {
@@ -558,6 +684,8 @@ export type UserBasicFragmentFragment = {
   appproved: Maybe<boolean>;
 
   area: Maybe<UserBasicFragmentArea>;
+
+  department: Maybe<UserBasicFragmentDepartment>;
 };
 
 export type UserBasicFragmentArea = {
@@ -567,6 +695,8 @@ export type UserBasicFragmentArea = {
 
   title: string;
 };
+
+export type UserBasicFragmentDepartment = DepartmentBasicFragmentFragment;
 
 import * as ReactApollo from "react-apollo";
 import * as React from "react";
@@ -584,19 +714,35 @@ export const AreaBasicFragmentFragmentDoc = gql`
   }
 `;
 
+export const RoleBasicFragmentFragmentDoc = gql`
+  fragment RoleBasicFragment on Role {
+    id
+    title
+  }
+`;
+
 export const DepartmentBasicFragmentFragmentDoc = gql`
   fragment DepartmentBasicFragment on Department {
     id
     title
     email
     phone
-  }
-`;
-
-export const RoleBasicFragmentFragmentDoc = gql`
-  fragment RoleBasicFragment on Role {
-    id
-    title
+    manager {
+      id
+      name
+    }
+    staffs {
+      id
+      name
+    }
+    roles {
+      id
+      title
+    }
+    areas {
+      id
+      title
+    }
   }
 `;
 
@@ -614,7 +760,12 @@ export const UserBasicFragmentFragmentDoc = gql`
       id
       title
     }
+    department {
+      ...DepartmentBasicFragment
+    }
   }
+
+  ${DepartmentBasicFragmentFragmentDoc}
 `;
 
 export const ScheduleBasicFragmentFragmentDoc = gql`
@@ -636,6 +787,109 @@ export const ScheduleBasicFragmentFragmentDoc = gql`
 // Components
 // ====================================================
 
+export const AssignAreaDepartmentsDocument = gql`
+  mutation AssignAreaDepartments($data: AssignAreaDepartmentsInput!) {
+    assignAreaDepartments(data: $data) {
+      ...AreaBasicFragment
+    }
+  }
+
+  ${AreaBasicFragmentFragmentDoc}
+`;
+export class AssignAreaDepartmentsComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<
+      AssignAreaDepartmentsMutation,
+      AssignAreaDepartmentsVariables
+    >
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<
+        AssignAreaDepartmentsMutation,
+        AssignAreaDepartmentsVariables
+      >
+        mutation={AssignAreaDepartmentsDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type AssignAreaDepartmentsProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<
+    AssignAreaDepartmentsMutation,
+    AssignAreaDepartmentsVariables
+  >
+> &
+  TChildProps;
+export type AssignAreaDepartmentsMutationFn = ReactApollo.MutationFn<
+  AssignAreaDepartmentsMutation,
+  AssignAreaDepartmentsVariables
+>;
+export function AssignAreaDepartmentsHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        AssignAreaDepartmentsMutation,
+        AssignAreaDepartmentsVariables,
+        AssignAreaDepartmentsProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    AssignAreaDepartmentsMutation,
+    AssignAreaDepartmentsVariables,
+    AssignAreaDepartmentsProps<TChildProps>
+  >(AssignAreaDepartmentsDocument, operationOptions);
+}
+export const CreateAreaDocument = gql`
+  mutation CreateArea($data: CreateAreaInput!) {
+    createArea(data: $data) {
+      ...AreaBasicFragment
+    }
+  }
+
+  ${AreaBasicFragmentFragmentDoc}
+`;
+export class CreateAreaComponent extends React.Component<
+  Partial<ReactApollo.MutationProps<CreateAreaMutation, CreateAreaVariables>>
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<CreateAreaMutation, CreateAreaVariables>
+        mutation={CreateAreaDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type CreateAreaProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<CreateAreaMutation, CreateAreaVariables>
+> &
+  TChildProps;
+export type CreateAreaMutationFn = ReactApollo.MutationFn<
+  CreateAreaMutation,
+  CreateAreaVariables
+>;
+export function CreateAreaHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        CreateAreaMutation,
+        CreateAreaVariables,
+        CreateAreaProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    CreateAreaMutation,
+    CreateAreaVariables,
+    CreateAreaProps<TChildProps>
+  >(CreateAreaDocument, operationOptions);
+}
 export const GetAllAreaDocument = gql`
   query GetAllArea {
     getAllArea {
@@ -677,6 +931,120 @@ export function GetAllAreaHOC<TProps, TChildProps = any>(
     GetAllAreaVariables,
     GetAllAreaProps<TChildProps>
   >(GetAllAreaDocument, operationOptions);
+}
+export const AssignDepartmentAreasDocument = gql`
+  mutation AssignDepartmentAreas($data: AssignDepartmentAreasInput!) {
+    assignDepartmentAreas(data: $data) {
+      ...DepartmentBasicFragment
+    }
+  }
+
+  ${DepartmentBasicFragmentFragmentDoc}
+`;
+export class AssignDepartmentAreasComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<
+      AssignDepartmentAreasMutation,
+      AssignDepartmentAreasVariables
+    >
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<
+        AssignDepartmentAreasMutation,
+        AssignDepartmentAreasVariables
+      >
+        mutation={AssignDepartmentAreasDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type AssignDepartmentAreasProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<
+    AssignDepartmentAreasMutation,
+    AssignDepartmentAreasVariables
+  >
+> &
+  TChildProps;
+export type AssignDepartmentAreasMutationFn = ReactApollo.MutationFn<
+  AssignDepartmentAreasMutation,
+  AssignDepartmentAreasVariables
+>;
+export function AssignDepartmentAreasHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        AssignDepartmentAreasMutation,
+        AssignDepartmentAreasVariables,
+        AssignDepartmentAreasProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    AssignDepartmentAreasMutation,
+    AssignDepartmentAreasVariables,
+    AssignDepartmentAreasProps<TChildProps>
+  >(AssignDepartmentAreasDocument, operationOptions);
+}
+export const AssignDepartmentRolesDocument = gql`
+  mutation AssignDepartmentRoles($data: AssignDepartmentRolesInput!) {
+    assignDepartmentRoles(data: $data) {
+      ...DepartmentBasicFragment
+    }
+  }
+
+  ${DepartmentBasicFragmentFragmentDoc}
+`;
+export class AssignDepartmentRolesComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<
+      AssignDepartmentRolesMutation,
+      AssignDepartmentRolesVariables
+    >
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<
+        AssignDepartmentRolesMutation,
+        AssignDepartmentRolesVariables
+      >
+        mutation={AssignDepartmentRolesDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type AssignDepartmentRolesProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<
+    AssignDepartmentRolesMutation,
+    AssignDepartmentRolesVariables
+  >
+> &
+  TChildProps;
+export type AssignDepartmentRolesMutationFn = ReactApollo.MutationFn<
+  AssignDepartmentRolesMutation,
+  AssignDepartmentRolesVariables
+>;
+export function AssignDepartmentRolesHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        AssignDepartmentRolesMutation,
+        AssignDepartmentRolesVariables,
+        AssignDepartmentRolesProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    AssignDepartmentRolesMutation,
+    AssignDepartmentRolesVariables,
+    AssignDepartmentRolesProps<TChildProps>
+  >(AssignDepartmentRolesDocument, operationOptions);
 }
 export const CreateDepartmentDocument = gql`
   mutation CreateDepartment($data: CreateDepartmentInput!) {
@@ -782,6 +1150,112 @@ export function DeleteByDepartmentIdHOC<TProps, TChildProps = any>(
     DeleteByDepartmentIdProps<TChildProps>
   >(DeleteByDepartmentIdDocument, operationOptions);
 }
+export const RemoveDepartmentAreasDocument = gql`
+  mutation removeDepartmentAreas($data: AssignDepartmentAreasInput!) {
+    removeDepartmentAreas(data: $data)
+  }
+`;
+export class RemoveDepartmentAreasComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<
+      RemoveDepartmentAreasMutation,
+      RemoveDepartmentAreasVariables
+    >
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<
+        RemoveDepartmentAreasMutation,
+        RemoveDepartmentAreasVariables
+      >
+        mutation={RemoveDepartmentAreasDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type RemoveDepartmentAreasProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<
+    RemoveDepartmentAreasMutation,
+    RemoveDepartmentAreasVariables
+  >
+> &
+  TChildProps;
+export type RemoveDepartmentAreasMutationFn = ReactApollo.MutationFn<
+  RemoveDepartmentAreasMutation,
+  RemoveDepartmentAreasVariables
+>;
+export function RemoveDepartmentAreasHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        RemoveDepartmentAreasMutation,
+        RemoveDepartmentAreasVariables,
+        RemoveDepartmentAreasProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    RemoveDepartmentAreasMutation,
+    RemoveDepartmentAreasVariables,
+    RemoveDepartmentAreasProps<TChildProps>
+  >(RemoveDepartmentAreasDocument, operationOptions);
+}
+export const RemoveDepartmentRolesDocument = gql`
+  mutation RemoveDepartmentRoles($data: AssignDepartmentRolesInput!) {
+    removeDepartmentRoles(data: $data)
+  }
+`;
+export class RemoveDepartmentRolesComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<
+      RemoveDepartmentRolesMutation,
+      RemoveDepartmentRolesVariables
+    >
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<
+        RemoveDepartmentRolesMutation,
+        RemoveDepartmentRolesVariables
+      >
+        mutation={RemoveDepartmentRolesDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type RemoveDepartmentRolesProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<
+    RemoveDepartmentRolesMutation,
+    RemoveDepartmentRolesVariables
+  >
+> &
+  TChildProps;
+export type RemoveDepartmentRolesMutationFn = ReactApollo.MutationFn<
+  RemoveDepartmentRolesMutation,
+  RemoveDepartmentRolesVariables
+>;
+export function RemoveDepartmentRolesHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        RemoveDepartmentRolesMutation,
+        RemoveDepartmentRolesVariables,
+        RemoveDepartmentRolesProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    RemoveDepartmentRolesMutation,
+    RemoveDepartmentRolesVariables,
+    RemoveDepartmentRolesProps<TChildProps>
+  >(RemoveDepartmentRolesDocument, operationOptions);
+}
 export const UpdateByDepartmentIdDocument = gql`
   mutation UpdateByDepartmentID($id: String!, $data: UpdateDepartmentInput!) {
     updateByDepartmentID(id: $id, data: $data) {
@@ -843,14 +1317,6 @@ export const GetAllDepartmentDocument = gql`
   query GetAllDepartment {
     getAllDepartment {
       ...DepartmentBasicFragment
-      manager {
-        id
-        name
-      }
-      staffs {
-        id
-        name
-      }
     }
   }
 
@@ -890,6 +1356,105 @@ export function GetAllDepartmentHOC<TProps, TChildProps = any>(
     GetAllDepartmentVariables,
     GetAllDepartmentProps<TChildProps>
   >(GetAllDepartmentDocument, operationOptions);
+}
+export const GetDepartmentDocument = gql`
+  query GetDepartment($id: String!) {
+    getDepartment(id: $id) {
+      ...DepartmentBasicFragment
+    }
+  }
+
+  ${DepartmentBasicFragmentFragmentDoc}
+`;
+export class GetDepartmentComponent extends React.Component<
+  Partial<ReactApollo.QueryProps<GetDepartmentQuery, GetDepartmentVariables>>
+> {
+  render() {
+    return (
+      <ReactApollo.Query<GetDepartmentQuery, GetDepartmentVariables>
+        query={GetDepartmentDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type GetDepartmentProps<TChildProps = any> = Partial<
+  ReactApollo.DataProps<GetDepartmentQuery, GetDepartmentVariables>
+> &
+  TChildProps;
+export function GetDepartmentHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        GetDepartmentQuery,
+        GetDepartmentVariables,
+        GetDepartmentProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    GetDepartmentQuery,
+    GetDepartmentVariables,
+    GetDepartmentProps<TChildProps>
+  >(GetDepartmentDocument, operationOptions);
+}
+export const AssignRoleDepartmentsDocument = gql`
+  mutation AssignRoleDepartments($data: AssignRoleDepartmentsInput!) {
+    assignRoleDepartments(data: $data) {
+      ...RoleBasicFragment
+    }
+  }
+
+  ${RoleBasicFragmentFragmentDoc}
+`;
+export class AssignRoleDepartmentsComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<
+      AssignRoleDepartmentsMutation,
+      AssignRoleDepartmentsVariables
+    >
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<
+        AssignRoleDepartmentsMutation,
+        AssignRoleDepartmentsVariables
+      >
+        mutation={AssignRoleDepartmentsDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type AssignRoleDepartmentsProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<
+    AssignRoleDepartmentsMutation,
+    AssignRoleDepartmentsVariables
+  >
+> &
+  TChildProps;
+export type AssignRoleDepartmentsMutationFn = ReactApollo.MutationFn<
+  AssignRoleDepartmentsMutation,
+  AssignRoleDepartmentsVariables
+>;
+export function AssignRoleDepartmentsHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        AssignRoleDepartmentsMutation,
+        AssignRoleDepartmentsVariables,
+        AssignRoleDepartmentsProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    AssignRoleDepartmentsMutation,
+    AssignRoleDepartmentsVariables,
+    AssignRoleDepartmentsProps<TChildProps>
+  >(AssignRoleDepartmentsDocument, operationOptions);
 }
 export const CreateRoleDocument = gql`
   mutation CreateRole($data: CreateRoleInput!) {

@@ -98,7 +98,10 @@ class Sidebar extends React.Component<Props, State> {
                     <img
                       src={require("../../static/assets/img/icons/Icons/admin icon.png")}
                     />
-                    <span>Manager, Department</span>
+                    <span>
+                      Manager
+                      {me && me.department ? `, ${me.department.title}` : ""}
+                    </span>
                   </a>
                 </Link>
               </div>

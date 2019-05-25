@@ -4,7 +4,7 @@ import { Button } from "reactstrap";
 export const RotaTableItemsTitle: React.SFC<{ title: string }> = ({
   title
 }) => (
-  <th scope="row">
+  <th scope="row" style={{ width: "100%" }}>
     <span className="mb-0 text-sm">{title}</span>
   </th>
 );
