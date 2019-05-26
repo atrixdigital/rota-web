@@ -32,14 +32,14 @@ interface Props<T, I> {
   fields: string[];
   loading: boolean;
   renderItem: (item: T) => JSX.Element;
-  toggleModal: () => void;
-  initialValue: I;
-  onSubmit: (values: I, formikActions: FormikActions<I>) => void;
-  validationSchema: any;
-  changeActionType: (type?: string) => Promise<void>;
-  getActionType: () => string;
-  generateFormFields: (values: I) => JSX.Element;
-  isModalOpen: boolean;
+  toggleModal?: (() => void) | undefined;
+  initialValue?: I | undefined;
+  onSubmit?: ((values: I, formikActions: FormikActions<I>) => void) | undefined;
+  validationSchema?: any | undefined;
+  changeActionType?: ((type?: string) => Promise<void>) | undefined;
+  getActionType?: (() => string) | undefined;
+  generateFormFields?: ((values: I) => JSX.Element) | undefined;
+  isModalOpen?: boolean | undefined;
   me?: MeMe;
   isCreate?: boolean;
   createLocation?: CreateButtonLocation;
@@ -48,6 +48,7 @@ interface Props<T, I> {
   filters?: FiltersClause;
   renderTypes?: () => JSX.Element[];
   renderAreas?: () => JSX.Element[];
+  customSearchField?: string | undefined;
 }
 
 interface State<T> {
@@ -86,16 +87,33 @@ class Crud<T extends {}, I extends {}> extends Component<
     });
   };
 
+  _byString = (o: T, s: string) => {
+    s = s.replace(/\[(\w+)\]/g, ".$1"); // convert indexes to properties
+    s = s.replace(/^\./, ""); // strip a leading dot
+    const a = s.split(".");
+    for (let i = 0, n = a.length; i < n; ++i) {
+      const k = a[i];
+      if (k in o) {
+        o = o[k];
+      } else {
+        return;
+      }
+    }
+    return o;
+  };
+
   _onSearch = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { items } = this.props;
+    const { items, customSearchField } = this.props;
     const { searchField } = this.state;
     if (searchField) {
       let updatedList = items;
       updatedList = updatedList.filter(item => {
+        let field = `${this._byString(item, searchField)}`;
+        if (customSearchField !== undefined) {
+          field = `${this._byString(item, customSearchField)}`;
+        }
         return (
-          `${item[this._camelize(searchField)]}`
-            .toLowerCase()
-            .search(event.target.value.toLowerCase()) !== -1
+          field.toLowerCase().search(event.target.value.toLowerCase()) !== -1
         );
       });
       this.setState({ items: updatedList }, () => {
@@ -136,8 +154,10 @@ class Crud<T extends {}, I extends {}> extends Component<
 
   _onCreateClick = async () => {
     const { changeActionType, toggleModal } = this.props;
-    await changeActionType();
-    toggleModal();
+    changeActionType && typeof changeActionType === "function"
+      ? await changeActionType()
+      : null;
+    toggleModal && typeof toggleModal === "function" ? toggleModal() : null;
   };
 
   render() {
@@ -150,7 +170,6 @@ class Crud<T extends {}, I extends {}> extends Component<
       initialValue,
       onSubmit,
       validationSchema,
-      changeActionType,
       getActionType,
       generateFormFields,
       isModalOpen,
@@ -438,37 +457,49 @@ class Crud<T extends {}, I extends {}> extends Component<
             <div />
           )} */}
         </Card>
-        <Modal isOpen={isModalOpen} toggle={toggleModal} size="lg">
-          <Formik<I>
-            initialValues={initialValue}
-            onSubmit={onSubmit}
-            validationSchema={validationSchema}
-            render={({ isSubmitting, values }) => {
-              return (
-                <Form>
-                  <ModalHeader toggle={toggleModal}>
-                    {getActionType()} {pageTitle}
-                  </ModalHeader>
-                  <ModalBody>
-                    <Row>{generateFormFields(values)}</Row>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button
-                      type="submit"
-                      color="primary"
-                      disabled={isSubmitting}
-                    >
-                      Submit
-                    </Button>
-                    <Button color="secondary" onClick={toggleModal}>
-                      Cancel
-                    </Button>
-                  </ModalFooter>
-                </Form>
-              );
-            }}
-          />
-        </Modal>
+        {toggleModal &&
+        typeof toggleModal === "function" &&
+        isModalOpen !== undefined &&
+        getActionType &&
+        typeof getActionType === "function" &&
+        initialValue !== undefined &&
+        validationSchema !== undefined &&
+        onSubmit &&
+        typeof onSubmit === "function" &&
+        generateFormFields &&
+        typeof generateFormFields === "function" ? (
+          <Modal isOpen={isModalOpen} toggle={toggleModal} size="lg">
+            <Formik<I>
+              initialValues={initialValue}
+              onSubmit={onSubmit}
+              validationSchema={validationSchema}
+              render={({ isSubmitting, values }) => {
+                return (
+                  <Form>
+                    <ModalHeader toggle={toggleModal}>
+                      {getActionType()} {pageTitle}
+                    </ModalHeader>
+                    <ModalBody>
+                      <Row>{generateFormFields(values)}</Row>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button
+                        type="submit"
+                        color="primary"
+                        disabled={isSubmitting}
+                      >
+                        Submit
+                      </Button>
+                      <Button color="secondary" onClick={toggleModal}>
+                        Cancel
+                      </Button>
+                    </ModalFooter>
+                  </Form>
+                );
+              }}
+            />
+          </Modal>
+        ) : null}
       </>
     );
   }
