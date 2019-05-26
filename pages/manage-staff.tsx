@@ -175,7 +175,13 @@ class RegisteredStaff extends Component<Props> {
                     toggleModal={toggleModal}
                     isModalOpen={modal}
                     pageTitle={"Registered Staff"}
-                    items={data.getAllUserByFilter}
+                    items={
+                      data &&
+                      data.getAllUserByFilter &&
+                      data.getAllUserByFilter.length > 0
+                        ? data.getAllUserByFilter
+                        : []
+                    }
                     fields={[
                       "name",
                       "area",

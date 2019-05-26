@@ -54,7 +54,9 @@ export default class RotaTable extends React.Component<Props> {
         <Table className="align-items-center table-flush" responsive>
           <thead className="thead-light">
             <tr>
-              {headings &&
+              {pageNumbers &&
+                pageNumbers.length > 0 &&
+                headings &&
                 headings.map((item, index) => (
                   <RotaTableHeadItems key={index} title={item} />
                 ))}
@@ -62,7 +64,7 @@ export default class RotaTable extends React.Component<Props> {
           </thead>
           <tbody>{children}</tbody>
         </Table>
-        {pageNumbers && pageNumbers.length > 0 ? (
+        {(pageNumbers && pageNumbers.length > 0) || onCreateClick ? (
           <CardFooter className="py-4">
             <div className="d-flex align-items-center">
               {onCreateClick && (
@@ -80,56 +82,58 @@ export default class RotaTable extends React.Component<Props> {
                   </Button>
                 </div>
               )}
-              <div className="flex-fill">
-                <nav aria-label="...">
-                  <Pagination
-                    className="pagination justify-content-end mb-0"
-                    listClassName="justify-content-end mb-0"
-                  >
-                    <PaginationItem
-                      className={currentPage <= 1 ? "disabled" : ""}
+              {pageNumbers && pageNumbers.length > 0 && (
+                <div className="flex-fill">
+                  <nav aria-label="...">
+                    <Pagination
+                      className="pagination justify-content-end mb-0"
+                      listClassName="justify-content-end mb-0"
                     >
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={e => this._onPageChange(e, "previous")}
+                      <PaginationItem
+                        className={currentPage <= 1 ? "disabled" : ""}
                       >
-                        <i className="fas fa-angle-left" />
-                        <span className="sr-only">Previous</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                    {pageNumbers.map(number => {
-                      return (
-                        <PaginationItem
-                          key={number}
-                          className={currentPage === number ? "active" : ""}
+                        <PaginationLink
+                          href="#pablo"
+                          onClick={e => this._onPageChange(e, "previous")}
                         >
-                          <PaginationLink
-                            id={number.toString()}
-                            onClick={e => this._onPageChange(e, number)}
+                          <i className="fas fa-angle-left" />
+                          <span className="sr-only">Previous</span>
+                        </PaginationLink>
+                      </PaginationItem>
+                      {pageNumbers.map(number => {
+                        return (
+                          <PaginationItem
+                            key={number}
+                            className={currentPage === number ? "active" : ""}
                           >
-                            {number}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    })}{" "}
-                    <PaginationItem
-                      className={
-                        currentPage >= 1 && currentPage >= pageNumbers.length
-                          ? "disabled"
-                          : ""
-                      }
-                    >
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={this._onPageChange}
+                            <PaginationLink
+                              id={number.toString()}
+                              onClick={e => this._onPageChange(e, number)}
+                            >
+                              {number}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      })}{" "}
+                      <PaginationItem
+                        className={
+                          currentPage >= 1 && currentPage >= pageNumbers.length
+                            ? "disabled"
+                            : ""
+                        }
                       >
-                        <i className="fas fa-angle-right" />
-                        <span className="sr-only">Next</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                  </Pagination>
-                </nav>
-              </div>
+                        <PaginationLink
+                          href="#pablo"
+                          onClick={this._onPageChange}
+                        >
+                          <i className="fas fa-angle-right" />
+                          <span className="sr-only">Next</span>
+                        </PaginationLink>
+                      </PaginationItem>
+                    </Pagination>
+                  </nav>
+                </div>
+              )}
             </div>
           </CardFooter>
         ) : null}

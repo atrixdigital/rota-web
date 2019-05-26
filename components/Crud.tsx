@@ -79,6 +79,13 @@ class Crud<T extends {}, I extends {}> extends Component<
     });
   }
 
+  _camelize = (str: string = ""): string => {
+    return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, (match, index) => {
+      if (+match === 0) return ""; // or if (/\s+/.test(match)) for white spaces
+      return index == 0 ? match.toLowerCase() : match.toUpperCase();
+    });
+  };
+
   _onSearch = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { items } = this.props;
     const { searchField } = this.state;
@@ -86,7 +93,7 @@ class Crud<T extends {}, I extends {}> extends Component<
       let updatedList = items;
       updatedList = updatedList.filter(item => {
         return (
-          item[searchField]
+          `${item[this._camelize(searchField)]}`
             .toLowerCase()
             .search(event.target.value.toLowerCase()) !== -1
         );
@@ -165,7 +172,6 @@ class Crud<T extends {}, I extends {}> extends Component<
       typeFieldValue
     } = this.state;
     const { pageNumbers, currentItems } = this._generatePaginationMeta();
-
     return (
       <>
         <Card className="shadow">
@@ -174,7 +180,7 @@ class Crud<T extends {}, I extends {}> extends Component<
               {typeof pageTitle === "function" ? pageTitle() : pageTitle}
             </h3>
             <Row className="align-items-center">
-              {isFilters && filters && items.length > 0 ? (
+              {isFilters && filters ? (
                 <>
                   {filters.isAreaFilter ? (
                     <div className="col-md-2 col-sm-6">
@@ -324,17 +330,20 @@ class Crud<T extends {}, I extends {}> extends Component<
                   </div>
                 </>
               )}
-              {(isCreate && createLocation === "top-right") || onDelete ? (
+              {(isCreate &&
+                (createLocation === "top-right" || !createLocation)) ||
+              onDelete ? (
                 <div className="col text-right">
-                  {isCreate && createLocation === "top-right" && (
-                    <Button
-                      color="primary"
-                      onClick={this._onCreateClick}
-                      size="sm"
-                    >
-                      Create
-                    </Button>
-                  )}
+                  {isCreate &&
+                    (createLocation === "top-right" || !createLocation) && (
+                      <Button
+                        color="primary"
+                        onClick={this._onCreateClick}
+                        size="sm"
+                      >
+                        Create
+                      </Button>
+                    )}
                   {onDelete && (
                     <Button color="primary" onClick={onDelete} size="sm">
                       Delete
@@ -346,7 +355,47 @@ class Crud<T extends {}, I extends {}> extends Component<
           </CardHeader>
           {/* render data and table */}
           {loading && <Loader className="col-12" />}
-          {items && items.length > 0 ? (
+          <RotaTable
+            headings={fields}
+            pageNumbers={pageNumbers}
+            currentPage={currentPage}
+            onPageChange={this._onPageChange}
+            onCreateClick={
+              isCreate && createLocation === "bottom-left"
+                ? this._onCreateClick
+                : false
+            }
+          >
+            {currentItems &&
+              currentItems.length > 0 &&
+              currentItems
+                .filter(item => {
+                  if (
+                    filters &&
+                    filters.isAreaFilter &&
+                    areaFieldValue !== ""
+                  ) {
+                    return item["area"]
+                      ? item["area"].id === areaFieldValue
+                      : true;
+                  }
+                  return true;
+                })
+                .filter(item => {
+                  if (
+                    filters &&
+                    filters.isTypeFilter &&
+                    typeFieldValue !== ""
+                  ) {
+                    return item["role"]
+                      ? item["role"].id === typeFieldValue
+                      : true;
+                  }
+                  return true;
+                })
+                .map(item => renderItem(item))}
+          </RotaTable>
+          {/* {items && items.length > 0 ? (
             <RotaTable
               headings={fields}
               pageNumbers={pageNumbers}
@@ -387,7 +436,7 @@ class Crud<T extends {}, I extends {}> extends Component<
             </RotaTable>
           ) : (
             <div />
-          )}
+          )} */}
         </Card>
         <Modal isOpen={isModalOpen} toggle={toggleModal} size="lg">
           <Formik<I>

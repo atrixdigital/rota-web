@@ -42,7 +42,7 @@ import {
 } from "../generated/apolloComponent";
 import { CrudProps } from "../interfaces";
 import { withAuth } from "../lib/withAuth";
-import { validateRoleIDSchema } from "../shared/validation-schema";
+import { validateScheduleSchema } from "../shared/validation-schema";
 
 interface Props
   extends CrudProps<
@@ -435,7 +435,7 @@ class ManageSchedule extends Component<Props, State> {
                               );
                             }}
                             initialValue={initialValue}
-                            validationSchema={validateRoleIDSchema}
+                            validationSchema={validateScheduleSchema}
                             onSubmit={async (
                               {
                                 startTime,
