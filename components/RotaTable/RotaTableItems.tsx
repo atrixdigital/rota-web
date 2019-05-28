@@ -1,11 +1,13 @@
 import React from "react";
 import { Button } from "reactstrap";
 
-export const RotaTableItemsTitle: React.SFC<{ title: string }> = ({
-  title
-}) => (
+export const RotaTableItemsTitle: React.SFC<{
+  title: string | (() => JSX.Element);
+}> = ({ title }) => (
   <th scope="row" style={{ width: "100%" }}>
-    <span className="mb-0 text-sm">{title}</span>
+    <span className="mb-0 text-sm">
+      {typeof title === "string" ? title : title()}
+    </span>
   </th>
 );
 

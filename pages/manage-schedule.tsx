@@ -15,7 +15,11 @@ import {
 } from "reactstrap";
 import AdminLayout from "../components/AdminLayout";
 import Crud from "../components/Crud";
-import { SelectField, TextField } from "../components/FormFields";
+import {
+  CheckBoxField,
+  SelectField,
+  TextField
+} from "../components/FormFields";
 import Header from "../components/Headers/Header";
 import Loader from "../components/Loader";
 import ModalHandlerHOC from "../components/ModalHandlerHOC";
@@ -25,7 +29,10 @@ import {
 } from "../components/RotaTable/RotaTableItems";
 import {
   ApprovedUserMutationFn,
+  CreateMultiScheduleHOC,
+  CreateMultiScheduleMutationFn,
   CreateScheduleHOC,
+  CreateScheduleInput,
   CreateScheduleMutationFn,
   DeleteByScheduleIdHOC,
   DeleteByScheduleIdMutationFn,
@@ -41,7 +48,9 @@ import {
   UpdateByScheduleIdMutationFn
 } from "../generated/apolloComponent";
 import { CrudProps } from "../interfaces";
+import FlashMessage from "../lib/FlashMessage";
 import { withAuth } from "../lib/withAuth";
+import { formatTimeDate } from "../shared/helpersFunctions";
 import { validateScheduleSchema } from "../shared/validation-schema";
 
 interface Props
@@ -50,6 +59,7 @@ interface Props
     UpdateByScheduleIdMutationFn,
     CreateScheduleMutationFn
   > {
+  createMulti: CreateMultiScheduleMutationFn;
   me?: MeMe;
   getAllUserByFilter: GetAllUserByFilterQuery;
   getAllRoleNoAuth: GetAllRoleNoAuthQuery;
@@ -61,10 +71,10 @@ interface Props
 interface InitialValue {
   startTime: Date;
   endTime: Date;
-  startDay: number;
   notes: string;
-  coreShift: string;
-  staffID: string;
+  coreShift: boolean;
+  locumShift: boolean;
+  staffName: string;
   roleID: string;
   areaID: string;
 }
@@ -113,22 +123,47 @@ class ManageSchedule extends Component<Props, State> {
     this.setState({ isModalOpen: !this.state.isModalOpen });
   };
 
+  _setTodayDate = (dateTime: Date) => {
+    const { selectedDate } = this.state;
+    dateTime.setDate(selectedDate.getDate());
+    dateTime.setMonth(selectedDate.getMonth());
+    dateTime.setFullYear(selectedDate.getFullYear());
+    return dateTime;
+  };
+
+  dIDate = (type: number = 1) => {
+    const { selectedDate } = this.state;
+    this.setState({
+      selectedDate: new Date(
+        selectedDate.setDate(selectedDate.getDate() + type)
+      )
+    });
+  };
+
+  _decrementDate = () => this.dIDate(-1);
+
+  _incrementDate = () => this.dIDate();
+
   render() {
     const {
       me,
       getAllUserByFilter: { getAllUserByFilter },
       deleteBy,
       updateBy,
-      create
+      create,
+      createMulti
     } = this.props;
     const { selectedDate, isModalOpen, newNote } = this.state;
+    const nextDay = new Date(selectedDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const flassMessage = new FlashMessage();
     return (
       <AdminLayout pageTitle={"Schedule Management"} me={me}>
         <Header />
         {/* Page content */}
         <Container className="mt--7" fluid>
           <GetMySchedulesComponent
-            variables={{ startDay: selectedDate.getDate() }}
+            variables={{ startDate: selectedDate.getTime() }}
             fetchPolicy="cache-and-network"
           >
             {({ data, loading, refetch }) => {
@@ -142,10 +177,10 @@ class ManageSchedule extends Component<Props, State> {
                       initialValue={{
                         startTime: new Date(),
                         endTime: new Date(),
-                        startDay: selectedDate.getDate(),
                         notes: "",
-                        coreShift: "",
-                        staffID: "",
+                        coreShift: false,
+                        locumShift: false,
+                        staffName: "",
                         roleID: "",
                         areaID: ""
                       }}
@@ -207,30 +242,14 @@ class ManageSchedule extends Component<Props, State> {
                                     </span>
                                     <Button
                                       className="mr-3 p-3 btn-rounded"
-                                      onClick={() =>
-                                        this.setState({
-                                          selectedDate: new Date(
-                                            selectedDate.setDate(
-                                              selectedDate.getDate() - 1
-                                            )
-                                          )
-                                        })
-                                      }
+                                      onClick={this._decrementDate}
                                     >
                                       <i className="fas fa-arrow-left" />
                                     </Button>
                                     <span>{selectedDate.getDate()}</span>
                                     <Button
                                       className="ml-3 p-3 btn-rounded"
-                                      onClick={() =>
-                                        this.setState({
-                                          selectedDate: new Date(
-                                            selectedDate.setDate(
-                                              selectedDate.getDate() + 1
-                                            )
-                                          )
-                                        })
-                                      }
+                                      onClick={this._incrementDate}
                                     >
                                       <i className="fas fa-arrow-right" />
                                     </Button>
@@ -241,13 +260,15 @@ class ManageSchedule extends Component<Props, State> {
                                       className="form-control-alternative"
                                       value={selectedDate.getMonth()}
                                       onChange={(ev: any) =>
-                                        this.setState({
-                                          selectedDate: new Date(
-                                            selectedDate.setMonth(
-                                              ev.target.value
-                                            )
-                                          )
-                                        })
+                                        ev.target.value
+                                          ? this.setState({
+                                              selectedDate: new Date(
+                                                selectedDate.setMonth(
+                                                  ev.target.value
+                                                )
+                                              )
+                                            })
+                                          : null
                                       }
                                     >
                                       {this._months.map((m, i) => (
@@ -257,19 +278,21 @@ class ManageSchedule extends Component<Props, State> {
                                       ))}
                                     </Input>
                                   </div>
-                                  <div>
+                                  <div className="mr-3">
                                     <Input
                                       type="select"
                                       className="form-control-alternative"
                                       value={selectedDate.getFullYear()}
                                       onChange={(ev: any) =>
-                                        this.setState({
-                                          selectedDate: new Date(
-                                            selectedDate.setFullYear(
-                                              ev.target.value
-                                            )
-                                          )
-                                        })
+                                        ev.target.value
+                                          ? this.setState({
+                                              selectedDate: new Date(
+                                                selectedDate.setFullYear(
+                                                  ev.target.value
+                                                )
+                                              )
+                                            })
+                                          : null
                                       }
                                     >
                                       {this._years(
@@ -280,6 +303,67 @@ class ManageSchedule extends Component<Props, State> {
                                         </option>
                                       ))}
                                     </Input>
+                                  </div>
+                                  <div>
+                                    <Button
+                                      color="primary"
+                                      size="sm"
+                                      onClick={async () => {
+                                        const newData: CreateScheduleInput[] = [];
+                                        if (
+                                          data &&
+                                          data.getMySchedules.length > 0
+                                        ) {
+                                          data.getMySchedules.map(
+                                            ({
+                                              __typename,
+                                              id,
+                                              staff,
+                                              role,
+                                              area,
+                                              startTime,
+                                              endTime,
+                                              ...s
+                                            }) => {
+                                              const startTimeDate = new Date(
+                                                startTime
+                                              );
+                                              const endTimeDate = new Date(
+                                                endTime
+                                              );
+                                              newData.push({
+                                                ...s,
+                                                roleID: role.id,
+                                                areaID: area.id,
+                                                staffID: "",
+                                                startTime: startTimeDate.setDate(
+                                                  startTimeDate.getDate() + 1
+                                                ),
+                                                endTime: endTimeDate.setDate(
+                                                  endTimeDate.getDate() + 1
+                                                ),
+                                                departmentID: me.department.id
+                                              });
+                                            }
+                                          );
+                                        }
+                                        await createMulti({
+                                          variables: {
+                                            data: [...newData]
+                                          }
+                                        });
+                                        flassMessage.text =
+                                          "Successfully added repeat data.";
+                                        flassMessage.type = "success";
+                                        flassMessage.show();
+                                      }}
+                                    >
+                                      Repeat for{" "}
+                                      {formatTimeDate(
+                                        nextDay.getTime(),
+                                        "date"
+                                      )}
+                                    </Button>
                                   </div>
                                 </div>
                               );
@@ -293,9 +377,11 @@ class ManageSchedule extends Component<Props, State> {
                               "Start Time",
                               "End Time",
                               "Core Shift",
+                              "Locum Shift",
                               "Role",
                               "Area",
                               "Select Name",
+                              "",
                               ""
                             ]}
                             loading={false}
@@ -305,8 +391,9 @@ class ManageSchedule extends Component<Props, State> {
                               id,
                               startTime,
                               endTime,
-                              startDay,
                               coreShift,
+                              locumShift,
+                              staffName,
                               notes,
                               role,
                               area,
@@ -314,13 +401,24 @@ class ManageSchedule extends Component<Props, State> {
                             }) => {
                               return (
                                 <tr key={id}>
-                                  <RotaTableItemsSimple text={startTime} />
-                                  <RotaTableItemsSimple text={endTime} />
-                                  <RotaTableItemsSimple text={coreShift} />
+                                  <RotaTableItemsSimple
+                                    text={formatTimeDate(startTime)}
+                                  />
+                                  <RotaTableItemsSimple
+                                    text={formatTimeDate(endTime)}
+                                  />
+                                  <RotaTableItemsSimple
+                                    text={coreShift ? "yes" : "no"}
+                                  />
+                                  <RotaTableItemsSimple
+                                    text={locumShift ? "yes" : "no"}
+                                  />
                                   <RotaTableItemsSimple text={role.title} />
                                   <RotaTableItemsSimple text={area.title} />
-                                  <td>
-                                    <div className="d-flex">
+                                  {locumShift ? (
+                                    <RotaTableItemsSimple text={staffName} />
+                                  ) : (
+                                    <td>
                                       <Input
                                         type="select"
                                         className="form-control-alternative"
@@ -333,7 +431,6 @@ class ManageSchedule extends Component<Props, State> {
                                                 data: {
                                                   startTime,
                                                   endTime,
-                                                  startDay,
                                                   coreShift,
                                                   roleID: role.id,
                                                   areaID: area.id,
@@ -356,69 +453,70 @@ class ManageSchedule extends Component<Props, State> {
                                             }
                                           )}
                                       </Input>
-                                      <Button
-                                        color="primary"
-                                        size="sm"
-                                        onClick={this._toggleModal}
-                                      >
+                                    </td>
+                                  )}
+                                  <td>
+                                    <Button
+                                      color="primary"
+                                      size="sm"
+                                      onClick={this._toggleModal}
+                                    >
+                                      Notes
+                                    </Button>
+                                    <Modal
+                                      isOpen={isModalOpen}
+                                      toggle={this._toggleModal}
+                                      size="lg"
+                                    >
+                                      <ModalHeader toggle={this._toggleModal}>
                                         Notes
-                                      </Button>
-                                      <Modal
-                                        isOpen={isModalOpen}
-                                        toggle={this._toggleModal}
-                                        size="lg"
-                                      >
-                                        <ModalHeader toggle={this._toggleModal}>
-                                          Notes
-                                        </ModalHeader>
-                                        <ModalBody>
-                                          <div>{notes}</div>
-                                          <div>
-                                            <Input
-                                              type="textarea"
-                                              className="form-control-alternative"
-                                              value={newNote}
-                                              onChange={e => {
-                                                this.setState({
-                                                  newNote: e.target.value
-                                                });
-                                              }}
-                                            />
-                                          </div>
-                                        </ModalBody>
-                                        <ModalFooter>
-                                          <Button
-                                            type="button"
-                                            color="primary"
-                                            onClick={async e => {
-                                              await updateBy({
-                                                variables: {
-                                                  id: id,
-                                                  data: {
-                                                    startTime,
-                                                    endTime,
-                                                    startDay,
-                                                    coreShift,
-                                                    roleID: role.id,
-                                                    areaID: area.id,
-                                                    notes: newNote
-                                                  }
-                                                }
+                                      </ModalHeader>
+                                      <ModalBody>
+                                        <div>{notes}</div>
+                                        <div>
+                                          <Input
+                                            type="textarea"
+                                            className="form-control-alternative"
+                                            value={newNote}
+                                            onChange={e => {
+                                              this.setState({
+                                                newNote: e.target.value
                                               });
-                                              this._toggleModal();
                                             }}
-                                          >
-                                            Submit
-                                          </Button>
-                                          <Button
-                                            color="secondary"
-                                            onClick={this._toggleModal}
-                                          >
-                                            Cancel
-                                          </Button>
-                                        </ModalFooter>
-                                      </Modal>
-                                    </div>
+                                          />
+                                        </div>
+                                      </ModalBody>
+                                      <ModalFooter>
+                                        <Button
+                                          type="button"
+                                          color="primary"
+                                          onClick={async e => {
+                                            await updateBy({
+                                              variables: {
+                                                id: id,
+                                                data: {
+                                                  startTime,
+                                                  endTime,
+                                                  coreShift,
+                                                  roleID: role.id,
+                                                  areaID: area.id,
+                                                  notes: newNote
+                                                }
+                                              }
+                                            });
+                                            this._toggleModal();
+                                          }}
+                                        >
+                                          Submit
+                                        </Button>
+                                        <Button
+                                          color="secondary"
+                                          onClick={this._toggleModal}
+                                        >
+                                          Cancel
+                                        </Button>
+                                      </ModalFooter>
+                                    </Modal>
                                   </td>
                                   {/* <RotaTableItemsSimple text={staff.name} /> */}
                                   <RotaTableItemsActions
@@ -440,10 +538,10 @@ class ManageSchedule extends Component<Props, State> {
                               {
                                 startTime,
                                 endTime,
-                                startDay,
                                 notes,
                                 coreShift,
-                                staffID,
+                                locumShift,
+                                staffName,
                                 roleID,
                                 areaID
                               },
@@ -454,24 +552,16 @@ class ManageSchedule extends Component<Props, State> {
                                 await create({
                                   variables: {
                                     data: {
-                                      startTime: `${`${startTime.getHours()}`.padStart(
-                                        2,
-                                        "0"
-                                      )}:${`${startTime.getMinutes()}`.padStart(
-                                        2,
-                                        "0"
-                                      )}`,
-                                      endTime: `${`${endTime.getHours()}`.padStart(
-                                        2,
-                                        "0"
-                                      )}:${`${endTime.getMinutes()}`.padStart(
-                                        2,
-                                        "0"
-                                      )}`,
-                                      startDay,
+                                      startTime: this._setTodayDate(
+                                        startTime
+                                      ).getTime(),
+                                      endTime: this._setTodayDate(
+                                        endTime
+                                      ).getTime(),
                                       notes,
                                       coreShift,
-                                      staffID,
+                                      locumShift,
+                                      staffName,
                                       roleID,
                                       areaID,
                                       departmentID: me.department.id
@@ -489,19 +579,25 @@ class ManageSchedule extends Component<Props, State> {
                                     label="Start Time"
                                     name="startTime"
                                     placeholder="Start Time"
-                                    componentType="datetimepicker"
+                                    componentType="timepicker"
                                   />
                                   <TextField
                                     label="End Time"
                                     name="endTime"
                                     placeholder="End Time"
-                                    componentType="datetimepicker"
+                                    componentType="timepicker"
                                   />
-                                  <TextField
+                                  <CheckBoxField
                                     label="Core Shift"
                                     name="coreShift"
                                     placeholder="Core Shift"
-                                    componentType="text"
+                                    componentType="checkbox"
+                                  />
+                                  <CheckBoxField
+                                    label="Locum Shift"
+                                    name="locumShift"
+                                    placeholder="Locum Shift"
+                                    componentType="checkbox"
                                   />
                                   <TextField
                                     label="Notes"
@@ -509,21 +605,14 @@ class ManageSchedule extends Component<Props, State> {
                                     placeholder="Notes"
                                     componentType="text"
                                   />
-                                  <SelectField
-                                    label="Staff"
-                                    name="staffID"
-                                    componentType="select"
-                                    options={
-                                      getAllUserByFilter.length > 0
-                                        ? getAllUserByFilter.map(
-                                            ({ id, name }) => ({
-                                              id,
-                                              title: name
-                                            })
-                                          )
-                                        : []
-                                    }
-                                  />
+                                  {iValues.locumShift && (
+                                    <TextField
+                                      label="Staff Name"
+                                      name="staffName"
+                                      placeholder="Staff Name"
+                                      componentType="text"
+                                    />
+                                  )}
                                   <SelectField
                                     label="Role"
                                     name="roleID"
@@ -561,82 +650,6 @@ class ManageSchedule extends Component<Props, State> {
                                     }
                                   />
                                 </>
-                                // <FieldArray
-                                //   name="roleIDField"
-                                //   render={({ insert, remove }) => {
-                                //     if (!iValues && !iValues.roleIDField) {
-                                //       return null;
-                                //     }
-                                //     if (iValues.roleIDField.length <= 0) {
-                                //       return null;
-                                //     }
-                                //     return iValues.roleIDField.map((_, i) => {
-                                //       return (
-                                //         <Fragment key={i}>
-                                //           <Col lg="12">
-                                //             <Row className="align-items-center">
-                                //               <Col lg="10">
-                                //                 <Row>
-                                //                   <SelectField
-                                //                     label="Roles"
-                                //                     name={`roleIDField.${i}.roleID`}
-                                //                     componentType="select"
-                                //                     options={[
-                                //                       ...(getAllRoleNoAuth.length > 0
-                                //                         ? getAllRoleNoAuth
-                                //                             .filter(
-                                //                               ({ title }) =>
-                                //                                 title !== "Manager"
-                                //                             )
-                                //                             .map(({ id, title }) => ({
-                                //                               id,
-                                //                               title
-                                //                             }))
-                                //                         : []),
-                                //                       {
-                                //                         id: "other",
-                                //                         title: "Other"
-                                //                       }
-                                //                     ]}
-                                //                   />
-                                //                   {iValues.roleIDField[i].roleID ===
-                                //                     "other" && (
-                                //                     <TextField
-                                //                       label="Title"
-                                //                       name={`roleIDField.${i}.title`}
-                                //                       placeholder="Title"
-                                //                       componentType="text"
-                                //                     />
-                                //                   )}
-                                //                 </Row>
-                                //               </Col>
-                                //               <Col className="d-flex justify-content-end">
-                                //                 {iValues.roleIDField.length > 1 && (
-                                //                   <Button
-                                //                     color="primary"
-                                //                     onClick={() => remove(i)}
-                                //                     size="sm"
-                                //                   >
-                                //                     <i className="fas fa-minus" />
-                                //                   </Button>
-                                //                 )}
-                                //                 <Button
-                                //                   color="primary"
-                                //                   onClick={() =>
-                                //                     insert(i, { roleID: "", title: "" })
-                                //                   }
-                                //                   size="sm"
-                                //                 >
-                                //                   <i className="fas fa-plus" />
-                                //                 </Button>
-                                //               </Col>
-                                //             </Row>
-                                //           </Col>
-                                //         </Fragment>
-                                //       );
-                                //     });
-                                //   }}
-                                // />
                               );
                             }}
                           />
@@ -671,7 +684,8 @@ export default compose(
   }),
   DeleteByScheduleIdHOC({ name: "deleteBy" }),
   UpdateByScheduleIdHOC({ name: "updateBy" }),
-  CreateScheduleHOC({ name: "create" })
+  CreateScheduleHOC({ name: "create" }),
+  CreateMultiScheduleHOC({ name: "createMulti" })
 )(withAuth(ManageSchedule));
 
 // export default withAuth(ManageSchedule);

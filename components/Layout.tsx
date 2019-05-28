@@ -27,7 +27,7 @@ class Layout extends React.Component<Props> {
             href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
             rel="stylesheet"
           />
-          <title>{title || "This is the default title"}</title>
+          <title>{title || "ROTA"}</title>
         </Head>
         {children}
       </>

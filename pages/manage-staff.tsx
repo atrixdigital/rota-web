@@ -1,4 +1,5 @@
 // javascipt plugin for creating charts
+import { ApolloQueryResult } from "apollo-boost";
 import React, { Component } from "react";
 import { compose } from "react-apollo";
 // reactstrap components
@@ -25,6 +26,8 @@ import {
   GetAllUserByFilterVariables,
   GetAllUserGetAllUser,
   GetDepartmentComponent,
+  GetDepartmentQuery,
+  GetDepartmentVariables,
   MeMe,
   UpdateByUserIdHOC,
   UpdateByUserIdMutationFn
@@ -56,7 +59,7 @@ class ManageStaff extends Component<Props> {
             variables={{ id: me.department.id }}
             fetchPolicy="cache-and-network"
           >
-            {({ data, loading }) => {
+            {({ data, loading, refetch }) => {
               if (loading) {
                 return <Loader />;
               }
@@ -66,7 +69,10 @@ class ManageStaff extends Component<Props> {
                     <RegisteredStaff {...this.props} />
                   </Col>
                   <Col className="mb-5" xl="12">
-                    <ApprovedStaffRequest {...this.props} />
+                    <ApprovedStaffRequest
+                      {...this.props}
+                      fullRefetch={refetch}
+                    />
                   </Col>
                 </Row>
               );
@@ -329,9 +335,15 @@ class RegisteredStaff extends Component<Props> {
   }
 }
 
-class ApprovedStaffRequest extends Component<Props> {
+interface ApproveStaffRequestProps extends Props {
+  fullRefetch: (
+    variables?: GetDepartmentVariables
+  ) => Promise<ApolloQueryResult<GetDepartmentQuery>>;
+}
+
+class ApprovedStaffRequest extends Component<ApproveStaffRequestProps> {
   render() {
-    const { me, create, updateBy } = this.props;
+    const { me, create, updateBy, fullRefetch } = this.props;
     const roles =
       me &&
       me.department &&
@@ -467,7 +479,7 @@ class ApprovedStaffRequest extends Component<Props> {
                       if (getActionType() === "create") {
                         await create({
                           variables: {
-                            data: values
+                            data: { ...values, appproved: true }
                           }
                         });
                       } else {
@@ -479,6 +491,7 @@ class ApprovedStaffRequest extends Component<Props> {
                         });
                       }
                       refetch();
+                      fullRefetch();
                       toggleModal();
                     }}
                     generateFormFields={() => {

@@ -8,8 +8,9 @@ export const ScheduleBasicFragment = gql`
     id
     startTime
     endTime
-    startDay
     coreShift
+    locumShift
+    staffName
     notes
     staff {
       ...UserBasicFragment

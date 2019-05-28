@@ -1,8 +1,7 @@
 /*eslint-disable*/
 import React from "react";
-
 // reactstrap components
-import { Row, Col, Nav, NavItem, NavLink } from "reactstrap";
+import { Col, Nav, NavItem, NavLink, Row } from "reactstrap";
 
 class Footer extends React.Component {
   render() {
@@ -32,36 +31,6 @@ class Footer extends React.Component {
                   target="_blank"
                 >
                   Tech Masters
-                </NavLink>
-              </NavItem>
-
-              <NavItem>
-                <NavLink
-                  href="https://www.creative-tim.com/presentation?ref=adr-admin-footer"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  About Us
-                </NavLink>
-              </NavItem>
-
-              <NavItem>
-                <NavLink
-                  href="http://blog.creative-tim.com?ref=adr-admin-footer"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Blog
-                </NavLink>
-              </NavItem>
-
-              <NavItem>
-                <NavLink
-                  href="https://github.com/creativetimofficial/argon-dashboard/blob/master/LICENSE.md?ref=adr-admin-footer"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  MIT License
                 </NavLink>
               </NavItem>
             </Nav>

@@ -9,7 +9,7 @@ const InputArea: React.SFC<InputProps> = props => {
   return <Input {...props} className="form-control-alternative" />;
 };
 const CheckBoxArea: React.SFC<InputProps> = props => {
-  return <input className="custom-control-input" {...props} />;
+  return <Input {...props} />;
 };
 const SelectArea: React.SFC<InputProps> = props => {
   return (
@@ -32,6 +32,25 @@ const DateTimePickerArea: React.SFC<ReactDatePickerProps> = props => {
       timeIntervals={15}
       dateFormat="MMMM d, yyyy h:mm aa"
       timeCaption="time"
+      className="form-control-alternative form-control"
+    />
+  );
+};
+const TimePickerArea: React.SFC<ReactDatePickerProps> = props => {
+  return (
+    <DatePicker
+      selected={new Date(props.value)}
+      onChange={dateFromValue => {
+        (props as any).setFieldValue(props.name, new Date(dateFromValue));
+      }}
+      id={props.name}
+      name={props.name}
+      showTimeSelect
+      showTimeSelectOnly
+      timeFormat="HH:mm"
+      timeIntervals={15}
+      dateFormat="HH:mm"
+      timeCaption="Time"
       className="form-control-alternative form-control"
     />
   );
@@ -73,9 +92,13 @@ const InputField: React.SFC<FieldProps<any> & InputFieldI> = ({
       break;
     case "checkbox":
       Comp = CheckBoxArea;
+      break;
     case "datetimepicker":
       custompProps.setFieldValue = setFieldValue;
       Comp = DateTimePickerArea;
+    case "timepicker":
+      custompProps.setFieldValue = setFieldValue;
+      Comp = TimePickerArea;
     default:
   }
   // const Comp = componentType === "textarea" ? TextArea : InputArea;

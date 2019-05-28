@@ -246,6 +246,32 @@ class Sidebar extends React.Component<Props, State> {
                   </NavLink>
                 </Link>
               </NavItem>
+              <LogoutComponent>
+                {mutate => {
+                  return (
+                    <NavItem>
+                      <NavLink
+                        onClick={async e => {
+                          e.preventDefault();
+                          await mutate();
+                          const flashMessage = new FlashMessage(
+                            "Successfully Logout.",
+                            "success"
+                          );
+                          flashMessage.show();
+                          Router.push("/auth/login");
+                        }}
+                        activeClassName="active"
+                      >
+                        <img
+                          src={require("../../static/assets/img/icons/Icons/sch.png")}
+                        />{" "}
+                        Logout
+                      </NavLink>
+                    </NavItem>
+                  );
+                }}
+              </LogoutComponent>
               {/* {isAdmin(me) ? (
                 <>
                   <NavItem>

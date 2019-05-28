@@ -16,6 +16,7 @@ import {
   ScheduleBasicFragmentFragment
 } from "../generated/apolloComponent";
 import { withAuth } from "../lib/withAuth";
+import { formatTimeDate } from "../shared/helpersFunctions";
 
 interface Props {
   me?: MeMe;
@@ -41,7 +42,7 @@ class DashBoard extends Component<Props> {
         {/* Page content */}
         <Container className="mt--7" fluid>
           <GetMySchedulesComponent
-            variables={{ startDay: new Date().getDate() }}
+            variables={{ startDate: new Date().getTime() }}
             fetchPolicy="cache-and-network"
           >
             {({ data, loading }) => {
@@ -86,7 +87,45 @@ class DashBoard extends Component<Props> {
                             })
                           : []
                       }
-                      pageTitle="Today's Routine"
+                      pageTitle={() => {
+                        return (
+                          <>
+                            <div className="d-flex align-items-center">
+                              <div>Today's Routine</div>
+                              <div
+                                className="ml-3"
+                                style={{ fontSize: "0.8rem" }}
+                              >
+                                <span
+                                  style={{
+                                    width: "10px",
+                                    height: "10px",
+                                    backgroundColor: "blue",
+                                    borderRadius: "5px"
+                                  }}
+                                  className="mr-2 d-inline-block"
+                                />
+                                Core Shift
+                              </div>
+                              <div
+                                className="ml-3"
+                                style={{ fontSize: "0.8rem" }}
+                              >
+                                <span
+                                  style={{
+                                    width: "10px",
+                                    height: "10px",
+                                    backgroundColor: "green",
+                                    borderRadius: "5px"
+                                  }}
+                                  className="mr-2 d-inline-block"
+                                />
+                                Locum Shift
+                              </div>
+                            </div>
+                          </>
+                        );
+                      }}
                       items={
                         data && data.getMySchedules.length > 0
                           ? data.getMySchedules
@@ -106,6 +145,8 @@ class DashBoard extends Component<Props> {
                         id,
                         startTime,
                         endTime,
+                        locumShift,
+                        staffName,
                         role,
                         area,
                         staff
@@ -113,12 +154,43 @@ class DashBoard extends Component<Props> {
                         return (
                           <tr key={id}>
                             <RotaTableItemsTitle
-                              title={staff && staff.name ? staff.name : "N/A"}
+                              title={() => {
+                                return (
+                                  <>
+                                    <span
+                                      style={{
+                                        width: "10px",
+                                        height: "10px",
+                                        backgroundColor: locumShift
+                                          ? "green"
+                                          : "blue",
+                                        borderRadius: "5px"
+                                      }}
+                                      className="mr-2 d-inline-block"
+                                    />
+                                    <span
+                                      style={{ textTransform: "capitalize" }}
+                                    >
+                                      {locumShift
+                                        ? staffName
+                                          ? staffName
+                                          : "N/a"
+                                        : staff && staff.name
+                                        ? staff.name
+                                        : "N/a"}
+                                    </span>
+                                  </>
+                                );
+                              }}
                             />
                             <RotaTableItemsSimple text={area.title} />
                             <RotaTableItemsSimple text={role.title} />
-                            <RotaTableItemsSimple text={startTime} />
-                            <RotaTableItemsSimple text={endTime} />
+                            <RotaTableItemsSimple
+                              text={formatTimeDate(startTime)}
+                            />
+                            <RotaTableItemsSimple
+                              text={formatTimeDate(endTime)}
+                            />
                             <RotaTableItemsSimple text="13:05" />
                             <RotaTableItemsSimple text="Active" />
                           </tr>

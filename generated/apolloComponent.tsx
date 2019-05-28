@@ -47,15 +47,17 @@ export interface UpdateUserInput {
 }
 
 export interface CreateScheduleInput {
-  startTime: string;
+  startTime: number;
 
-  endTime: string;
-
-  startDay: number;
+  endTime: number;
 
   notes?: Maybe<string>;
 
-  coreShift: string;
+  coreShift?: Maybe<boolean>;
+
+  locumShift?: Maybe<boolean>;
+
+  staffName?: Maybe<string>;
 
   joinTime?: Maybe<string>;
 
@@ -69,15 +71,17 @@ export interface CreateScheduleInput {
 }
 
 export interface UpdateScheduleInput {
-  startTime: string;
+  startTime: number;
 
-  endTime: string;
-
-  startDay: number;
+  endTime: number;
 
   notes?: Maybe<string>;
 
-  coreShift: string;
+  coreShift?: Maybe<boolean>;
+
+  locumShift?: Maybe<boolean>;
+
+  staffName?: Maybe<string>;
 
   joinTime?: Maybe<string>;
 
@@ -368,6 +372,18 @@ export type GetAllRoleNoAuthGetAllRoleNoAuth = {
   title: string;
 };
 
+export type CreateMultiScheduleVariables = {
+  data: CreateScheduleInput[];
+};
+
+export type CreateMultiScheduleMutation = {
+  __typename?: "Mutation";
+
+  createMultiSchedule: CreateMultiScheduleCreateMultiSchedule[];
+};
+
+export type CreateMultiScheduleCreateMultiSchedule = ScheduleBasicFragmentFragment;
+
 export type CreateScheduleVariables = {
   data: CreateScheduleInput;
 };
@@ -414,7 +430,7 @@ export type GetAllScheduleQuery = {
 export type GetAllScheduleGetAllSchedule = ScheduleBasicFragmentFragment;
 
 export type GetMySchedulesVariables = {
-  startDay: number;
+  startDate: number;
 };
 
 export type GetMySchedulesQuery = {
@@ -671,13 +687,15 @@ export type ScheduleBasicFragmentFragment = {
 
   id: string;
 
-  startTime: string;
+  startTime: number;
 
-  endTime: string;
+  endTime: number;
 
-  startDay: number;
+  coreShift: Maybe<boolean>;
 
-  coreShift: string;
+  locumShift: Maybe<boolean>;
+
+  staffName: Maybe<string>;
 
   notes: Maybe<string>;
 
@@ -803,8 +821,9 @@ export const ScheduleBasicFragmentFragmentDoc = gql`
     id
     startTime
     endTime
-    startDay
     coreShift
+    locumShift
+    staffName
     notes
     staff {
       ...UserBasicFragment
@@ -1718,6 +1737,63 @@ export function GetAllRoleNoAuthHOC<TProps, TChildProps = any>(
     GetAllRoleNoAuthProps<TChildProps>
   >(GetAllRoleNoAuthDocument, operationOptions);
 }
+export const CreateMultiScheduleDocument = gql`
+  mutation CreateMultiSchedule($data: [CreateScheduleInput!]!) {
+    createMultiSchedule(data: $data) {
+      ...ScheduleBasicFragment
+    }
+  }
+
+  ${ScheduleBasicFragmentFragmentDoc}
+`;
+export class CreateMultiScheduleComponent extends React.Component<
+  Partial<
+    ReactApollo.MutationProps<
+      CreateMultiScheduleMutation,
+      CreateMultiScheduleVariables
+    >
+  >
+> {
+  render() {
+    return (
+      <ReactApollo.Mutation<
+        CreateMultiScheduleMutation,
+        CreateMultiScheduleVariables
+      >
+        mutation={CreateMultiScheduleDocument}
+        {...(this as any)["props"] as any}
+      />
+    );
+  }
+}
+export type CreateMultiScheduleProps<TChildProps = any> = Partial<
+  ReactApollo.MutateProps<
+    CreateMultiScheduleMutation,
+    CreateMultiScheduleVariables
+  >
+> &
+  TChildProps;
+export type CreateMultiScheduleMutationFn = ReactApollo.MutationFn<
+  CreateMultiScheduleMutation,
+  CreateMultiScheduleVariables
+>;
+export function CreateMultiScheduleHOC<TProps, TChildProps = any>(
+  operationOptions:
+    | ReactApollo.OperationOption<
+        TProps,
+        CreateMultiScheduleMutation,
+        CreateMultiScheduleVariables,
+        CreateMultiScheduleProps<TChildProps>
+      >
+    | undefined
+) {
+  return ReactApollo.graphql<
+    TProps,
+    CreateMultiScheduleMutation,
+    CreateMultiScheduleVariables,
+    CreateMultiScheduleProps<TChildProps>
+  >(CreateMultiScheduleDocument, operationOptions);
+}
 export const CreateScheduleDocument = gql`
   mutation CreateSchedule($data: CreateScheduleInput!) {
     createSchedule(data: $data) {
@@ -1919,8 +1995,8 @@ export function GetAllScheduleHOC<TProps, TChildProps = any>(
   >(GetAllScheduleDocument, operationOptions);
 }
 export const GetMySchedulesDocument = gql`
-  query GetMySchedules($startDay: Float!) {
-    getMySchedules(startDay: $startDay) {
+  query GetMySchedules($startDate: Float!) {
+    getMySchedules(startDate: $startDate) {
       ...ScheduleBasicFragment
     }
   }

@@ -1,6 +1,6 @@
 import { Field } from "formik";
 import React from "react";
-import { Col, FormGroup } from "reactstrap";
+import { Col, FormGroup, Label } from "reactstrap";
 import InputField from "./input-field";
 
 interface TextFieldProps {
@@ -28,6 +28,19 @@ const BaseField: React.SFC<TextFieldProps & { type: string }> = ({
 
 export const TextField: React.SFC<TextFieldProps> = props => {
   return <BaseField {...props} type="text" />;
+};
+
+export const CheckBoxField: React.SFC<TextFieldProps> = props => {
+  return (
+    <Col lg="6">
+      <FormGroup check>
+        <Label check>
+          <Field {...props} type="checkbox" component={InputField} />{" "}
+          {props.label}
+        </Label>
+      </FormGroup>
+    </Col>
+  );
 };
 
 export const NumberField: React.SFC<TextFieldProps> = props => {

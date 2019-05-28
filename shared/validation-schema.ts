@@ -68,7 +68,6 @@ export const validateScheduleSchema1 = yup.object().shape({
 export const validateScheduleSchema = yup.object().shape({
   startTime: yup.date().required(),
   endTime: yup.date().required(),
-  coreShift: yup.string().required(),
   roleID: yup.string().required(),
   areaID: yup.string().required()
 });
