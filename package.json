@@ -65,7 +65,7 @@
     "@types/react-toggle": "^4.0.2",
     "@types/reactstrap": "^8.0.1",
     "@types/yup": "^0.26.7",
-    "graphql-code-generator": "^0.16.0",
+    "graphql-code-generator": "^0.18.2",
     "graphql-codegen-typescript-client": "^0.16.0",
     "graphql-codegen-typescript-common": "^0.16.0",
     "graphql-codegen-typescript-react-apollo": "^0.16.0",
